@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>東海水果公司管理系統</title>
+  <style>
+    /* 基本樣式 */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      background-color: #f4f4f4;
+    }
+
+    .sidebar {
+      width: 200px;
+      background: #333;
+      color: white;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 18px;
+    }
+
+    .sidebar button {
+      background: none;
+      color: white;
+      border: none;
+      padding: 15px 20px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      transition: background 0.3s;
+    }
+
+    .sidebar button:hover {
+      background: #575757;
+    }
+
+    .content {
+      margin-left: 200px;
+      padding: 20px;
+      flex-grow: 1;
+      background: white;
+      min-height: 100vh;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    img {
+      max-width: 100px;
+      max-height: 100px;
+    }
+
+    /* 按鈕區域樣式 */
+    .action-buttons {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-buttons button.operation-btn {
+      padding: 8px 12px;
+      margin-right: 10px;
+      margin-bottom: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid #007bff;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .action-buttons button.operation-btn:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+
+    .action-buttons button.print-btn {
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid #28a745;
+      background-color: #28a745;
+      color: white;
+      border-radius: 4px;
+      transition: background-color 0.3s, border-color 0.3s;
+      margin-bottom: 5px;
+    }
+
+    .action-buttons button.print-btn:hover {
+      background-color: #1e7e34;
+      border-color: #1e7e34;
+    }
+
+    /* Modal樣式 */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto; /* 5% from the top and centered */
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%; /* Could be more or less, depending on screen size */
+      max-width: 600px;
+      border-radius: 5px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* 表單樣式 */
+    .modal form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal label {
+      margin-top: 10px;
+      margin-bottom: 5px;
+      text-align: left;
+    }
+
+    .modal input, .modal select, .modal textarea {
+      padding: 8px;
+      font-size: 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .modal textarea {
+      resize: vertical;
+    }
+
+    .modal button.submit-btn {
+      margin-top: 20px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #17a2b8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    .modal button.submit-btn:hover {
+      background-color: #138496;
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 1200px) {
+      table {
+        width: 100%;
+      }
+      .sidebar {
+        width: 150px;
+      }
+      .sidebar button {
+        padding: 10px 15px;
+        font-size: 14px;
+      }
+    }
+
+    /* 選中行的樣式 */
+    tr.selected {
+      background-color: #d1e7dd;
+    }
+  </style>
+</head>
+<body>
+  <!-- 側邊選單 -->
+  <div class="sidebar">
+    <h2>系統選單</h2>
+    <button onclick="loadData('fruits')">水果資料表</button>
+    <button onclick="loadData('members')">會員資料表</button>
+    <button onclick="loadData('inactive')">靜止會員資料表</button>
+    <button onclick="loadData('suppliers')">供應商資料表</button>
+    <button onclick="loadData('transactions')">交易資料表</button>
+  </div>
+
+  <!-- 內容區域 -->
+  <div class="content">
+    <!-- 水果資料表 -->
+    <div id="fruits" class="table-container hidden">
+      <h2>水果資料表</h2>
+      <div class="action-buttons">
+        <button class="operation-btn" onclick="openModal('fruits', 'add')">新增</button>
+        <button class="operation-btn" onclick="openModal('fruits', 'select')">查詢</button>
+        <button class="operation-btn" onclick="openModal('fruits', 'edit')">修改</button>
+        <button class="operation-btn" onclick="openModal('fruits', 'delete')">刪除</button>
+        <button class="print-btn" onclick="printTable('fruits')">列印</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>水果編號</th>
+            <th>水果名稱</th>
+            <th>水果供應商名稱</th>
+            <th>現有數量</th>
+            <th>單位</th>
+            <th>進貨單價</th>
+            <th>現有價值小計</th>
+            <th>公司內存放位置</th>
+            <th>進貨日期</th>
+            <th>開始促銷日期</th>
+            <th>該丟棄之日期</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- 會員資料表 -->
+    <div id="members" class="table-container hidden">
+      <h2>會員資料表</h2>
+      <div class="action-buttons">
+        <button class="operation-btn" onclick="openModal('members', 'add')">新增</button>
+        <button class="operation-btn" onclick="openModal('members', 'select')">查詢</button>
+        <button class="operation-btn" onclick="openModal('members', 'edit')">修改</button>
+        <button class="operation-btn" onclick="openModal('members', 'delete')">刪除</button>
+        <button class="print-btn" onclick="printTable('members')">列印</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>會員身分證字號</th>
+            <th>會員姓名</th>
+            <th>電話</th>
+            <th>手機號碼</th>
+            <th>Email</th>
+            <th>是否加入Line</th>
+            <th>住址</th>
+            <th>年齡</th>
+            <th>照片</th>
+            <th>會員折扣</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- 靜止會員資料表 -->
+    <div id="inactive" class="table-container hidden">
+      <h2>靜止會員資料表</h2>
+      <div class="action-buttons">
+        <button class="operation-btn" onclick="openModal('inactive', 'add')">新增</button>
+        <button class="operation-btn" onclick="openModal('inactive', 'select')">查詢</button>
+        <button class="operation-btn" onclick="openModal('inactive', 'edit')">修改</button>
+        <button class="operation-btn" onclick="openModal('inactive', 'delete')">刪除</button>
+        <button class="print-btn" onclick="printTable('inactive')">列印</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>會員身分證字號</th>
+            <th>會員姓名</th>
+            <th>電話</th>
+            <th>手機號碼</th>
+            <th>Email</th>
+            <th>是否加入Line</th>
+            <th>住址</th>
+            <th>年齡</th>
+            <th>照片</th>
+            <th>會員折扣</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- 供應商資料表 -->
+    <div id="suppliers" class="table-container hidden">
+      <h2>供應商資料表</h2>
+      <div class="action-buttons">
+        <button class="operation-btn" onclick="openModal('suppliers', 'add')">新增</button>
+        <button class="operation-btn" onclick="openModal('suppliers', 'select')">查詢</button>
+        <button class="operation-btn" onclick="openModal('suppliers', 'edit')">修改</button>
+        <button class="operation-btn" onclick="openModal('suppliers', 'delete')">刪除</button>
+        <button class="print-btn" onclick="printTable('suppliers')">列印</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>供應商統一編號</th>
+            <th>水果供應商名稱</th>
+            <th>電話</th>
+            <th>Email</th>
+            <th>住址</th>
+            <th>負責人姓名</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- 交易資料表 -->
+    <div id="transactions" class="table-container hidden">
+      <h2>交易資料表</h2>
+      <div class="action-buttons">
+        <button class="operation-btn" onclick="openModal('transactions', 'add')">新增</button>
+        <button class="operation-btn" onclick="openModal('transactions', 'select')">查詢</button>
+        <button class="operation-btn" onclick="openModal('transactions', 'edit')">修改</button>
+        <button class="operation-btn" onclick="openModal('transactions', 'delete')">刪除</button>
+        <button class="print-btn" onclick="printTable('transactions')">列印</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>水果編號</th>
+            <th>會員身分證字號</th>
+            <th>水果名稱</th>
+            <th>水果供應商名稱</th>
+            <th>購買數量</th>
+            <th>出售單價</th>
+            <th>總金額</th>
+            <th>折扣後金額</th>
+            <th>交易日期</th>
+            <th>預計交運日期</th>
+            <th>實際交運日期</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal 結構 -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modal-title">操作</h2>
+      <form id="modal-form">
+        <!-- 表單內容將根據不同表格動態生成 -->
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:8080/api'; // 後端 API 的基礎網址
+
+    // 全局變數
+    let selectedRow = null;
+    let pendingOperation = null; // 用於追蹤當前的操作（add, select, edit, delete）
+    let pendingTable = null; // 用於追蹤當前操作的表格
+
+    // 動態加載表格資料
+    function loadData(table) {
+      const tables = document.querySelectorAll('.table-container');
+      tables.forEach(t => t.classList.add('hidden'));
+      const targetTable = document.getElementById(table);
+      if (targetTable) {
+        targetTable.classList.remove('hidden');
+        fetchData(table); // 從後端獲取資料
+      }
+    }
+
+    // 從後端 API 獲取資料
+    async function fetchData(table) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/${table}`);
+        const data = await response.json();
+        renderTable(table, data);
+      } catch (error) {
+        console.error('資料加載失敗:', error);
+        alert('無法加載資料，請檢查後端伺服器狀態！');
+      }
+    }
+
+    // 渲染表格內容
+    function renderTable(table, data) {
+      const tableBody = document.querySelector(`#${table} tbody`);
+      tableBody.innerHTML = '';
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        Object.entries(row).forEach(([key, value]) => {
+          const td = document.createElement('td');
+          if (key.toLowerCase() === 'photo') { // 處理圖片欄位
+            const img = document.createElement('img');
+            img.src = value;
+            td.appendChild(img);
+          } else {
+            td.textContent = value;
+            // 為住址欄位添加工具提示
+            if ((table === 'members' || table === 'inactive') && key.toLowerCase() === 'address') {
+              td.setAttribute('title', value);
+            }
+          }
+          tr.appendChild(td);
+        });
+        tableBody.appendChild(tr);
+      });
+
+      // 添加行點擊事件以選擇記錄
+      tableBody.querySelectorAll('tr').forEach(tr => {
+        tr.addEventListener('click', () => {
+          if (selectedRow) {
+            selectedRow.classList.remove('selected');
+          }
+          selectedRow = tr;
+          selectedRow.classList.add('selected');
+        });
+      });
+    }
+
+    // 開啟 Modal
+    function openModal(table, action) {
+      const modal = document.getElementById('modal');
+      const modalTitle = document.getElementById('modal-title');
+      const modalForm = document.getElementById('modal-form');
+      
+      if (action === 'edit' || action === 'delete') {
+        // 設定待處理的操作和表格
+        pendingOperation = action;
+        pendingTable = table;
+        
+        // 設定模態框標題為「查詢資料」
+        modalTitle.textContent = '查詢資料';
+        
+        // 生成查詢表單
+        modalForm.innerHTML = generateForm(table, 'select');
+        modal.style.display = 'block';
+      } else {
+        // 對於其他操作（add, select），正常處理
+        pendingOperation = action;
+        pendingTable = table;
+        
+        modalTitle.textContent = `${action === 'add' ? '新增' : action === 'select' ? '查詢'}資料`;
+        modalForm.innerHTML = generateForm(table, action);
+        modal.style.display = 'block';
+      }
+    }
+
+    // 關閉 Modal
+    function closeModal() {
+      const modal = document.getElementById('modal');
+      modal.style.display = 'none';
+    }
+
+    // 生成表單 HTML
+    function generateForm(table, action) {
+      let formHTML = '';
+      switch(table) {
+        case 'fruits':
+          formHTML += generateFruitsForm(table, action);
+          break;
+        case 'members':
+          formHTML += generateMembersForm(table, action);
+          break;
+        case 'inactive':
+          formHTML += generateInactiveForm(table, action);
+          break;
+        case 'suppliers':
+          formHTML += generateSuppliersForm(table, action);
+          break;
+        case 'transactions':
+          formHTML += generateTransactionsForm(table, action);
+          break;
+        default:
+          formHTML = '';
+      }
+      // 標註必填內容並添加提交按鈕
+      if (action !== 'select') {
+        formHTML += `<button type="submit" class="submit-btn">${action === 'add' ? '新增' : action === 'edit' ? '修改' : action === 'delete' ? '刪除' : '查詢'}</button>`;
+      } else {
+        formHTML += `<button type="submit" class="submit-btn">查詢</button>`;
+      }
+      return formHTML;
+    }
+
+    // 生成水果資料表的表單
+    function generateFruitsForm(table, action) {
+      let formHTML = '';
+      const required = 'required';
+      if (action === 'add' || action === 'edit') {
+        formHTML += `
+          <label for="fruit_id">水果編號 <span style="color:red;">*</span>:</label>
+          <input type="text" id="fruit_id" name="fruit_id" maxlength="13" ${action === 'edit' ? 'readonly' : ''} pattern="\\d{2}-\\d{3}-\\d{3}-\\d{2}" ${action === 'add' ? required : ''}>
+
+          <label for="fruit_name">水果名稱 <span style="color:red;">*</span>:</label>
+          <input type="text" id="fruit_name" name="fruit_name" maxlength="12" ${required}>
+
+          <label for="supplier_name">水果供應商名稱 <span style="color:red;">*</span>:</label>
+          <input type="text" id="supplier_name" name="supplier_name" maxlength="12" ${required}>
+
+          <label for="quantity">現有數量 <span style="color:red;">*</span>:</label>
+          <input type="number" id="quantity" name="quantity" max="999999" ${required}>
+
+          <label for="unit">單位 <span style="color:red;">*</span>:</label>
+          <input type="text" id="unit" name="unit" maxlength="4" ${required}>
+
+          <label for="purchase_price">進貨單價 <span style="color:red;">*</span>:</label>
+          <input type="number" step="0.01" id="purchase_price" name="purchase_price" max="999999.99" ${required}>
+
+          <label for="storage_location">公司內存放位置 <span style="color:red;">*</span>:</label>
+          <input type="text" id="storage_location" name="storage_location" maxlength="12" ${required}>
+
+          <label for="purchase_date">進貨日期 <span style="color:red;">*</span>:</label>
+          <input type="date" id="purchase_date" name="purchase_date" ${required}>
+
+          <label for="promotion_start_date">開始促銷日期 <span style="color:red;">*</span>:</label>
+          <input type="date" id="promotion_start_date" name="promotion_start_date" ${required}>
+
+          <label for="discard_date">該丟棄之日期 <span style="color:red;">*</span>:</label>
+          <input type="date" id="discard_date" name="discard_date" ${required}>
+        `;
+      } else if (action === 'select') {
+        // 查詢模式，所有欄位均為選填
+        formHTML += `
+          <label for="fruit_id">水果編號:</label>
+          <input type="text" id="fruit_id" name="fruit_id" maxlength="13" pattern="\\d{2}-\\d{3}-\\d{3}-\\d{2}">
+
+          <label for="fruit_name">水果名稱:</label>
+          <input type="text" id="fruit_name" name="fruit_name" maxlength="12">
+
+          <label for="supplier_name">水果供應商名稱:</label>
+          <input type="text" id="supplier_name" name="supplier_name" maxlength="12">
+
+          <label for="quantity">現有數量:</label>
+          <input type="number" id="quantity" name="quantity" max="999999">
+
+          <label for="unit">單位:</label>
+          <input type="text" id="unit" name="unit" maxlength="4">
+
+          <label for="purchase_price">進貨單價:</label>
+          <input type="number" step="0.01" id="purchase_price" name="purchase_price" max="999999.99">
+
+          <label for="storage_location">公司內存放位置:</label>
+          <input type="text" id="storage_location" name="storage_location" maxlength="12">
+
+          <label for="purchase_date">進貨日期:</label>
+          <input type="date" id="purchase_date" name="purchase_date">
+
+          <label for="promotion_start_date">開始促銷日期:</label>
+          <input type="date" id="promotion_start_date" name="promotion_start_date">
+
+          <label for="discard_date">該丟棄之日期:</label>
+          <input type="date" id="discard_date" name="discard_date">
+        `;
+      } else if (action === 'delete') {
+        // 刪除模式，通常只需要主鍵，但根據您的需求，我們顯示所有欄位並將主鍵設為唯讀
+        formHTML += `
+          <label for="fruit_id">水果編號 <span style="color:red;">*</span>:</label>
+          <input type="text" id="fruit_id" name="fruit_id" maxlength="13" readonly pattern="\\d{2}-\\d{3}-\\d{3}-\\d{2}" required>
+
+          <label for="fruit_name">水果名稱:</label>
+          <input type="text" id="fruit_name" name="fruit_name" maxlength="12" readonly>
+
+          <label for="supplier_name">水果供應商名稱:</label>
+          <input type="text" id="supplier_name" name="supplier_name" maxlength="12" readonly>
+
+          <label for="quantity">現有數量:</label>
+          <input type="number" id="quantity" name="quantity" max="999999" readonly>
+
+          <label for="unit">單位:</label>
+          <input type="text" id="unit" name="unit" maxlength="4" readonly>
+
+          <label for="purchase_price">進貨單價:</label>
+          <input type="number" step="0.01" id="purchase_price" name="purchase_price" max="999999.99" readonly>
+
+          <label for="storage_location">公司內存放位置:</label>
+          <input type="text" id="storage_location" name="storage_location" maxlength="12" readonly>
+
+          <label for="purchase_date">進貨日期:</label>
+          <input type="date" id="purchase_date" name="purchase_date" readonly>
+
+          <label for="promotion_start_date">開始促銷日期:</label>
+          <input type="date" id="promotion_start_date" name="promotion_start_date" readonly>
+
+          <label for="discard_date">該丟棄之日期:</label>
+          <input type="date" id="discard_date" name="discard_date" readonly>
+        `;
+      }
+      return formHTML;
+    }
+
+    // 生成會員資料表的表單
+    function generateMembersForm(table, action) {
+      let formHTML = '';
+      const required = 'required';
+      if (action === 'add' || action === 'edit') {
+        formHTML += `
+          <label for="member_id">會員身分證字號 <span style="color:red;">*</span>:</label>
+          <input type="text" id="member_id" name="member_id" maxlength="10" ${action === 'edit' ? 'readonly' : ''} pattern="[A-Z]{1}\\d{9}" ${action === 'add' ? required : ''}>
+
+          <label for="member_name">會員姓名 <span style="color:red;">*</span>:</label>
+          <input type="text" id="member_name" name="member_name" maxlength="12" ${required}>
+
+          <label for="phone">電話 <span style="color:red;">*</span>:</label>
+          <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}" ${required}>
+
+          <label for="mobile">手機號碼 <span style="color:red;">*</span>:</label>
+          <input type="text" id="mobile" name="mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}" ${required}>
+
+          <label for="email">Email <span style="color:red;">*</span>:</label>
+          <input type="email" id="email" name="email" maxlength="36" ${required}>
+
+          <label for="line_joined">是否加入Line <span style="color:red;">*</span>:</label>
+          <select id="line_joined" name="line_joined" ${required}>
+            <option value="">請選擇</option>
+            <option value="是">是</option>
+            <option value="不是">不是</option>
+          </select>
+
+          <label for="address">住址 <span style="color:red;">*</span>:</label>
+          <textarea id="address" name="address" maxlength="60" ${required}></textarea>
+
+          <label for="age">年齡 <span style="color:red;">*</span>:</label>
+          <input type="number" id="age" name="age" min="0" max="9999" ${required}>
+
+          <label for="photo">照片 <span style="color:red;">*</span>:</label>
+          <input type="file" id="photo" name="photo" accept="image/*" ${action === 'add' ? required : ''}>
+
+          <label for="discount">會員折扣 <span style="color:red;">*</span>:</label>
+          <input type="number" step="0.01" id="discount" name="discount" min="0" max="9.99" ${required}>
+        `;
+      } else if (action === 'select') {
+        // 查詢模式，所有欄位均為選填
+        formHTML += `
+          <label for="member_id">會員身分證字號:</label>
+          <input type="text" id="member_id" name="member_id" maxlength="10" pattern="[A-Z]{1}\\d{9}">
+
+          <label for="member_name">會員姓名:</label>
+          <input type="text" id="member_name" name="member_name" maxlength="12">
+
+          <label for="phone">電話:</label>
+          <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+
+          <label for="mobile">手機號碼:</label>
+          <input type="text" id="mobile" name="mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}">
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" maxlength="36">
+
+          <label for="line_joined">是否加入Line:</label>
+          <select id="line_joined" name="line_joined">
+            <option value="">請選擇</option>
+            <option value="是">是</option>
+            <option value="不是">不是</option>
+          </select>
+
+          <label for="address">住址:</label>
+          <textarea id="address" name="address" maxlength="60"></textarea>
+
+          <label for="age">年齡:</label>
+          <input type="number" id="age" name="age" min="0" max="9999">
+
+          <label for="photo">照片:</label>
+          <input type="file" id="photo" name="photo" accept="image/*">
+
+          <label for="discount">會員折扣:</label>
+          <input type="number" step="0.01" id="discount" name="discount" min="0" max="9.99">
+        `;
+      } else if (action === 'delete') {
+        // 刪除模式，顯示所有欄位並將主鍵設為唯讀
+        formHTML += `
+          <label for="member_id">會員身分證字號 <span style="color:red;">*</span>:</label>
+          <input type="text" id="member_id" name="member_id" maxlength="10" readonly pattern="[A-Z]{1}\\d{9}" required>
+
+          <label for="member_name">會員姓名:</label>
+          <input type="text" id="member_name" name="member_name" maxlength="12" readonly>
+
+          <label for="phone">電話:</label>
+          <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}" readonly>
+
+          <label for="mobile">手機號碼:</label>
+          <input type="text" id="mobile" name="mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}" readonly>
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" maxlength="36" readonly>
+
+          <label for="line_joined">是否加入Line:</label>
+          <select id="line_joined" name="line_joined" disabled>
+            <option value="">請選擇</option>
+            <option value="是">是</option>
+            <option value="不是">不是</option>
+          </select>
+
+          <label for="address">住址:</label>
+          <textarea id="address" name="address" maxlength="60" readonly></textarea>
+
+          <label for="age">年齡:</label>
+          <input type="number" id="age" name="age" min="0" max="9999" readonly>
+
+          <label for="photo">照片:</label>
+          <input type="file" id="photo" name="photo" accept="image/*" disabled>
+
+          <label for="discount">會員折扣:</label>
+          <input type="number" step="0.01" id="discount" name="discount" min="0" max="9.99" readonly>
+        `;
+      }
+      return formHTML;
+    }
+
+    // 生成靜止會員資料表的表單
+    function generateInactiveForm(table, action) {
+      let formHTML = '';
+      const required = 'required';
+      if (action === 'add' || action === 'edit') {
+        formHTML += `
+          <label for="member_id">會員身分證字號 <span style="color:red;">*</span>:</label>
+          <input type="text" id="member_id" name="member_id" maxlength="10" ${action === 'edit' ? 'readonly' : ''} pattern="[A-Z]{1}\\d{9}" ${action === 'add' ? required : ''}>
+
+          <label for="member_name">會員姓名 <span style="color:red;">*</span>:</label>
+          <input type="text" id="member_name" name="member_name" maxlength="12" ${required}>
+
+          <label for="phone">電話 <span style="color:red;">*</span>:</label>
+          <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}" ${required}>
+
+          <label for="mobile">手機號碼 <span style="color:red;">*</span>:</label>
+          <input type="text" id="mobile" name="mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}" ${required}>
+
+          <label for="email">Email <span style="color:red;">*</span>:</label>
+          <input type="email" id="email" name="email" maxlength="36" ${required}>
+
+          <label for="line_joined">是否加入Line <span style="color:red;">*</span>:</label>
+          <select id="line_joined" name="line_joined" ${required}>
+            <option value="">請選擇</option>
+            <option value="是">是</option>
+            <option value="不是">不是</option>
+          </select>
+
+          <label for="address">住址 <span style="color:red;">*</span>:</label>
+          <textarea id="address" name="address" maxlength="60" ${required}></textarea>
+
+          <label for="age">年齡 <span style="color:red;">*</span>:</label>
+          <input type="number" id="age" name="age" min="0" max="9999" ${required}>
+
+          <label for="photo">照片 <span style="color:red;">*</span>:</label>
+          <input type="file" id="photo" name="photo" accept="image/*" ${action === 'add' ? required : ''}>
+
+          <label for="discount">會員折扣 <span style="color:red;">*</span>:</label>
+          <input type="number" step="0.01" id="discount" name="discount" min="0" max="9.99" ${required}>
+        `;
+      } else if (action === 'select') {
+        // 查詢模式，所有欄位均為選填
+        formHTML += `
+          <label for="member_id">會員身分證字號:</label>
+          <input type="text" id="member_id" name="member_id" maxlength="10" pattern="[A-Z]{1}\\d{9}">
+
+          <label for="member_name">會員姓名:</label>
+          <input type="text" id="member_name" name="member_name" maxlength="12">
+
+          <label for="phone">電話:</label>
+          <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+
+          <label for="mobile">手機號碼:</label>
+          <input type="text" id="mobile" name="mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}">
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" maxlength="36">
+
+          <label for="line_joined">是否加入Line:</label>
+          <select id="line_joined" name="line_joined">
+            <option value="">請選擇</option>
+            <option value="是">是</option>
+            <option value="不是">不是</option>
+          </select>
+
+          <label for="address">住址:</label>
+          <textarea id="address" name="address" maxlength="60"></textarea>
+
+          <label for="age">年齡:</label>
+          <input type="number" id="age" name="age" min="0" max="9999">
+
+          <label for="photo">照片:</label>
+          <input type="file" id="photo" name="photo" accept="image/*">
+
+          <label for="discount">會員折扣:</label>
+          <input type="number" step="0.01" id="discount" name="discount" min="0" max="9.99">
+        `;
+      } else if (action === 'delete') {
+        // 刪除模式，顯示所有欄位並將主鍵設為唯讀
+        formHTML += `
+          <label for="member_id">會員身分證字號 <span style="color:red;">*</span>:</label>
+          <input type="text" id="member_id" name="member_id" maxlength="10" readonly pattern="[A-Z]{1}\\d{9}" required>
+
+          <label for="member_name">會員姓名:</label>
+          <input type="text" id="member_name" name="member_name" maxlength="12" readonly>
+
+          <label for="phone">電話:</label>
+          <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}" readonly>
+
+          <label for="mobile">手機號碼:</label>
+          <input type="text" id="mobile" name="mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}" readonly>
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" maxlength="36" readonly>
+
+          <label for="line_joined">是否加入Line:</label>
+          <select id="line_joined" name="line_joined" disabled>
+            <option value="">請選擇</option>
+            <option value="是">是</option>
+            <option value="不是">不是</option>
+          </select>
+
+          <label for="address">住址:</label>
+          <textarea id="address" name="address" maxlength="60" readonly></textarea>
+
+          <label for="age">年齡:</label>
+          <input type="number" id="age" name="age" min="0" max="9999" readonly>
+
+          <label for="photo">照片:</label>
+          <input type="file" id="photo" name="photo" accept="image/*" disabled>
+
+          <label for="discount">會員折扣:</label>
+          <input type="number" step="0.01" id="discount" name="discount" min="0" max="9.99" readonly>
+        `;
+      }
+      return formHTML;
+    }
+
+    // 生成供應商資料表的表單
+    function generateSuppliersForm(table, action) {
+      let formHTML = '';
+      const required = 'required';
+      if (action === 'add' || action === 'edit') {
+        formHTML += `
+          <label for="supplier_id">供應商統一編號 <span style="color:red;">*</span>:</label>
+          <input type="text" id="supplier_id" name="supplier_id" maxlength="8" ${action === 'edit' ? 'readonly' : ''} pattern="\\d{8}" ${action === 'add' ? required : ''}>
+
+          <label for="supplier_name">水果供應商名稱 <span style="color:red;">*</span>:</label>
+          <input type="text" id="supplier_name" name="supplier_name" maxlength="12" ${required}>
+
+          <label for="phone">電話 <span style="color:red;">*</span>:</label>
+          <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}" ${required}>
+
+          <label for="email">Email <span style="color:red;">*</span>:</label>
+          <input type="email" id="email" name="email" maxlength="36" ${required}>
+
+          <label for="address">住址 <span style="color:red;">*</span>:</label>
+          <textarea id="address" name="address" maxlength="60" ${required}></textarea>
+
+          <label for="manager_name">負責人姓名 <span style="color:red;">*</span>:</label>
+          <input type="text" id="manager_name" name="manager_name" maxlength="12" ${required}>
+        `;
+      } else if (action === 'select') {
+        // 查詢模式，所有欄位均為選填
+        formHTML += `
+          <label for="supplier_id">供應商統一編號:</label>
+          <input type="text" id="supplier_id" name="supplier_id" maxlength="8" pattern="\\d{8}">
+
+          <label for="supplier_name">水果供應商名稱:</label>
+          <input type="text" id="supplier_name" name="supplier_name" maxlength="12">
+
+          <label for="phone">電話:</label>
+          <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" maxlength="36">
+
+          <label for="address">住址:</label>
+          <textarea id="address" name="address" maxlength="60"></textarea>
+
+          <label for="manager_name">負責人姓名:</label>
+          <input type="text" id="manager_name" name="manager_name" maxlength="12">
+        `;
+      } else if (action === 'delete') {
+        // 刪除模式，顯示所有欄位並將主鍵設為唯讀
+        formHTML += `
+          <label for="supplier_id">供應商統一編號 <span style="color:red;">*</span>:</label>
+          <input type="text" id="supplier_id" name="supplier_id" maxlength="8" readonly pattern="\\d{8}" required>
+
+          <label for="supplier_name">水果供應商名稱:</label>
+          <input type="text" id="supplier_name" name="supplier_name" maxlength="12" readonly>
+
+          <label for="phone">電話:</label>
+          <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}" readonly>
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" maxlength="36" readonly>
+
+          <label for="address">住址:</label>
+          <textarea id="address" name="address" maxlength="60" readonly></textarea>
+
+          <label for="manager_name">負責人姓名:</label>
+          <input type="text" id="manager_name" name="manager_name" maxlength="12" readonly>
+        `;
+      }
+      return formHTML;
+    }
+
+    // 生成交易資料表的表單
+    function generateTransactionsForm(table, action) {
+      let formHTML = '';
+      const required = 'required';
+      if (action === 'add' || action === 'edit') {
+        formHTML += `
+          <label for="fruit_id">水果編號 <span style="color:red;">*</span>:</label>
+          <input type="text" id="fruit_id" name="fruit_id" maxlength="13" pattern="\\d{2}-\\d{3}-\\d{3}-\\d{2}" ${action === 'edit' ? 'readonly' : ''} ${action === 'add' ? required : ''}>
+
+          <label for="member_id">會員身分證字號 <span style="color:red;">*</span>:</label>
+          <input type="text" id="member_id" name="member_id" maxlength="10" pattern="[A-Z]{1}\\d{9}" ${action === 'add' ? required : ''}>
+
+          <label for="fruit_name">水果名稱 <span style="color:red;">*</span>:</label>
+          <input type="text" id="fruit_name" name="fruit_name" maxlength="12" ${required}>
+
+          <label for="supplier_name">水果供應商名稱 <span style="color:red;">*</span>:</label>
+          <input type="text" id="supplier_name" name="supplier_name" maxlength="12" ${required}>
+
+          <label for="purchase_quantity">購買數量 <span style="color:red;">*</span>:</label>
+          <input type="number" id="purchase_quantity" name="purchase_quantity" max="999999" ${required}>
+
+          <label for="sale_price">出售單價 <span style="color:red;">*</span>:</label>
+          <input type="number" step="0.01" id="sale_price" name="sale_price" max="999999.99" ${required}>
+
+          <label for="transaction_date">交易日期 <span style="color:red;">*</span>:</label>
+          <input type="date" id="transaction_date" name="transaction_date" ${required}>
+
+          <label for="expected_shipping_date">預計交運日期 <span style="color:red;">*</span>:</label>
+          <input type="date" id="expected_shipping_date" name="expected_shipping_date" ${required}>
+
+          <label for="actual_shipping_date">實際交運日期 <span style="color:red;">*</span>:</label>
+          <input type="date" id="actual_shipping_date" name="actual_shipping_date" ${required}>
+        `;
+      } else if (action === 'select') {
+        // 查詢模式，所有欄位均為選填
+        formHTML += `
+          <label for="fruit_id">水果編號:</label>
+          <input type="text" id="fruit_id" name="fruit_id" maxlength="13" pattern="\\d{2}-\\d{3}-\\d{3}-\\d{2}">
+
+          <label for="member_id">會員身分證字號:</label>
+          <input type="text" id="member_id" name="member_id" maxlength="10" pattern="[A-Z]{1}\\d{9}">
+
+          <label for="fruit_name">水果名稱:</label>
+          <input type="text" id="fruit_name" name="fruit_name" maxlength="12">
+
+          <label for="supplier_name">水果供應商名稱:</label>
+          <input type="text" id="supplier_name" name="supplier_name" maxlength="12">
+
+          <label for="purchase_quantity">購買數量:</label>
+          <input type="number" id="purchase_quantity" name="purchase_quantity" max="999999">
+
+          <label for="sale_price">出售單價:</label>
+          <input type="number" step="0.01" id="sale_price" name="sale_price" max="999999.99">
+
+          <label for="transaction_date">交易日期:</label>
+          <input type="date" id="transaction_date" name="transaction_date">
+
+          <label for="expected_shipping_date">預計交運日期:</label>
+          <input type="date" id="expected_shipping_date" name="expected_shipping_date">
+
+          <label for="actual_shipping_date">實際交運日期:</label>
+          <input type="date" id="actual_shipping_date" name="actual_shipping_date">
+        `;
+      } else if (action === 'delete') {
+        // 刪除模式，顯示所有欄位並將主鍵設為唯讀
+        formHTML += `
+          <label for="fruit_id">水果編號 <span style="color:red;">*</span>:</label>
+          <input type="text" id="fruit_id" name="fruit_id" maxlength="13" readonly pattern="\\d{2}-\\d{3}-\\d{3}-\\d{2}" required>
+
+          <label for="member_id">會員身分證字號 <span style="color:red;">*</span>:</label>
+          <input type="text" id="member_id" name="member_id" maxlength="10" pattern="[A-Z]{1}\\d{9}" readonly required>
+
+          <label for="fruit_name">水果名稱:</label>
+          <input type="text" id="fruit_name" name="fruit_name" maxlength="12" readonly>
+
+          <label for="supplier_name">水果供應商名稱:</label>
+          <input type="text" id="supplier_name" name="supplier_name" maxlength="12" readonly>
+
+          <label for="purchase_quantity">購買數量:</label>
+          <input type="number" id="purchase_quantity" name="purchase_quantity" max="999999" readonly>
+
+          <label for="sale_price">出售單價:</label>
+          <input type="number" step="0.01" id="sale_price" name="sale_price" max="999999.99" readonly>
+
+          <label for="transaction_date">交易日期:</label>
+          <input type="date" id="transaction_date" name="transaction_date" readonly>
+
+          <label for="expected_shipping_date">預計交運日期:</label>
+          <input type="date" id="expected_shipping_date" name="expected_shipping_date" readonly>
+
+          <label for="actual_shipping_date">實際交運日期:</label>
+          <input type="date" id="actual_shipping_date" name="actual_shipping_date" readonly>
+        `;
+      }
+      return formHTML;
+    }
+
+    // 生成供應商資料表的表單
+    // (保持與上述相同，不再重複)
+
+    // 填充表單數據（編輯模式）
+    function populateForm(table, row) {
+      const form = document.getElementById('modal-form');
+      switch(table) {
+        case 'fruits':
+          form.fruit_id.value = row['水果編號'];
+          form.fruit_name.value = row['水果名稱'];
+          form.supplier_name.value = row['水果供應商名稱'];
+          form.quantity.value = row['現有數量'];
+          form.unit.value = row['單位'];
+          form.purchase_price.value = row['進貨單價'];
+          form.storage_location.value = row['公司內存放位置'];
+          form.purchase_date.value = row['進貨日期'];
+          form.promotion_start_date.value = row['開始促銷日期'];
+          form.discard_date.value = row['該丟棄之日期'];
+          break;
+
+        case 'members':
+        case 'inactive':
+          form.member_id.value = row['會員身分證字號'];
+          form.member_name.value = row['會員姓名'];
+          form.phone.value = row['電話'];
+          form.mobile.value = row['手機號碼'];
+          form.email.value = row['Email'];
+          form.line_joined.value = row['是否加入Line'];
+          form.address.value = row['住址'];
+          form.age.value = row['年齡'];
+          form.discount.value = row['會員折扣'];
+          break;
+
+        case 'suppliers':
+          form.supplier_id.value = row['供應商統一編號'];
+          form.supplier_name.value = row['水果供應商名稱'];
+          form.phone.value = row['電話'];
+          form.email.value = row['Email'];
+          form.address.value = row['住址'];
+          form.manager_name.value = row['負責人姓名'];
+          break;
+
+        case 'transactions':
+          form.fruit_id.value = row['水果編號'];
+          form.member_id.value = row['會員身分證字號'];
+          form.fruit_name.value = row['水果名稱'];
+          form.supplier_name.value = row['水果供應商名稱'];
+          form.purchase_quantity.value = row['購買數量'];
+          form.sale_price.value = row['出售單價'];
+          form.transaction_date.value = row['交易日期'];
+          form.expected_shipping_date.value = row['預計交運日期'];
+          form.actual_shipping_date.value = row['實際交運日期'];
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    // 關閉 Modal 點擊空白處關閉
+    window.onclick = function(event) {
+      const modal = document.getElementById('modal');
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    // 處理表單提交
+    document.getElementById('modal-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const form = event.target;
+      const table = pendingTable;
+      const operation = pendingOperation;
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+
+      if (operation === 'select') {
+        // 普通查詢操作
+        selectRecord(table, data).then(() => {
+          closeModal();
+        });
+      } else if (operation === 'edit' || operation === 'delete') {
+        // 先進行查詢以選擇記錄
+        selectRecord(table, data).then(selectedData => {
+          if (selectedData.length === 1) {
+            const selectedRowData = selectedData[0];
+            openEditDeleteForm(operation, table, selectedRowData);
+          } else if (selectedData.length === 0) {
+            alert('未找到符合條件的記錄。');
+          } else {
+            alert('請精確查詢僅選擇一條記錄。');
+          }
+        }).catch(error => {
+          console.error('查詢失敗:', error);
+          alert('查詢失敗，請稍後再試。');
+        });
+      } else {
+        // 其他操作（add）
+        if (operation === 'add') {
+          // 處理圖片上傳（將圖片轉換為 Base64 字符串）
+          const photoInput = form.querySelector('input[type="file"]');
+          if (photoInput && photoInput.files.length > 0) {
+            const file = photoInput.files[0];
+            const reader = new FileReader();
+            reader.onloadend = function() {
+              data['photo'] = reader.result; // 將圖片轉換為 Base64
+              createRecord(table, data);
+            }
+            reader.readAsDataURL(file);
+          } else {
+            createRecord(table, data);
+          }
+        }
+        closeModal();
+      }
+    });
+
+    // 執行操作
+    function executeOperation(operation, table, data) {
+      if (operation === '新增') {
+        createRecord(table, data);
+      } else if (operation === '修改') {
+        updateRecord(table, data);
+      } else if (operation === '刪除') {
+        deleteRecord(table, data);
+      } else if (operation === '移轉') {
+        transferRecord(table, data);
+      } else if (operation === '查詢') {
+        selectRecord(table, data);
+      }
+    }
+
+    // 獲取當前顯示的表格名稱
+    function getCurrentTable() {
+      const tables = document.querySelectorAll('.table-container');
+      for (const table of tables) {
+        if (!table.classList.contains('hidden')) {
+          return table.id;
+        }
+      }
+      return null;
+    }
+
+    // 新增資料
+    async function createRecord(table, data) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/${table}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        if (response.ok) {
+          alert('新增成功！');
+          fetchData(table);
+        } else {
+          const errorData = await response.json();
+          alert(`新增失敗：${errorData.message}`);
+        }
+      } catch (error) {
+        console.error('新增資料失敗:', error);
+        alert('無法新增資料，請檢查後端伺服器狀態！');
+      }
+    }
+
+    // 修改資料
+    async function updateRecord(table, data) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/${table}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        if (response.ok) {
+          alert('修改成功！');
+          fetchData(table);
+        } else {
+          const errorData = await response.json();
+          alert(`修改失敗：${errorData.message}`);
+        }
+      } catch (error) {
+        console.error('修改資料失敗:', error);
+        alert('無法修改資料，請檢查後端伺服器狀態！');
+      }
+    }
+
+    // 刪除資料
+    async function deleteRecord(table, data) {
+      const keyAttr = getKeyAttribute(table);
+      const identifier = data[keyAttr];
+      if (!identifier) {
+        alert('未提供必要的識別碼。');
+        return;
+      }
+      try {
+        const response = await fetch(`${API_BASE_URL}/${table}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ identifier }) // 根據後端需求調整
+        });
+        if (response.ok) {
+          alert('刪除成功！');
+          fetchData(table);
+        } else {
+          const errorData = await response.json();
+          alert(`刪除失敗：${errorData.message}`);
+        }
+      } catch (error) {
+        console.error('刪除資料失敗:', error);
+        alert('無法刪除資料，請檢查後端伺服器狀態！');
+      }
+    }
+
+    // 移轉資料（僅針對靜止會員資料表）
+    async function transferRecord(table, data) {
+      if (table !== 'inactive') return;
+      const member_id = data['transfer_member_id'] || data['member_id']; // 支援不同表單欄位名稱
+      if (!member_id) {
+        alert('未提供會員身分證字號。');
+        return;
+      }
+      try {
+        const response = await fetch(`${API_BASE_URL}/transfer`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ member_id })
+        });
+        if (response.ok) {
+          alert('移轉成功！');
+          fetchData(table);
+          fetchData('members');
+        } else {
+          const errorData = await response.json();
+          alert(`移轉失敗：${errorData.message}`);
+        }
+      } catch (error) {
+        console.error('移轉資料失敗:', error);
+        alert('無法移轉資料，請檢查後端伺服器狀態！');
+      }
+    }
+
+    // 查詢資料
+    async function selectRecord(table, data) {
+      // 根據表格類型和查詢條件發送 GET 請求
+      let query = '';
+      Object.entries(data).forEach(([key, value]) => {
+        if (value) { // 只有在有值的情況下才添加到查詢
+          query += `${encodeURIComponent(key)}=${encodeURIComponent(value)}&`;
+        }
+      });
+      // 去掉最後的 &
+      query = query.slice(0, -1);
+      try {
+        const response = await fetch(`${API_BASE_URL}/${table}?${query}`);
+        if (response.ok) {
+          const data = await response.json();
+          renderTable(table, data);
+          alert('查詢成功！');
+          return data; // 返回查詢結果
+        } else {
+          const errorData = await response.json();
+          alert(`查詢失敗：${errorData.message}`);
+          return [];
+        }
+      } catch (error) {
+        console.error('查詢資料失敗:', error);
+        alert('無法查詢資料，請檢查後端伺服器狀態！');
+        return [];
+      }
+    }
+
+    // 列印資料（展示表格中的所有內容）
+    async function printTable(table) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/${table}`);
+        if (response.ok) {
+          const data = await response.json();
+          renderTable(table, data);
+          alert('表格已展示所有內容！');
+        } else {
+          const errorData = await response.json();
+          alert(`列印失敗：${errorData.message}`);
+        }
+      } catch (error) {
+        console.error('列印資料失敗:', error);
+        alert('無法列印資料，請檢查後端伺服器狀態！');
+      }
+    }
+
+    // 打開修改或刪除的表單
+    function openEditDeleteForm(operation, table, rowData) {
+      const modal = document.getElementById('modal');
+      const modalTitle = document.getElementById('modal-title');
+      const modalForm = document.getElementById('modal-form');
+      
+      modalTitle.textContent = `${operation === 'edit' ? '修改' : '刪除'}資料`;
+      modalForm.innerHTML = generateForm(table, operation);
+      populateForm(table, rowData);
+      modal.style.display = 'block';
+      
+      // 重置待處理的操作
+      pendingOperation = null;
+      pendingTable = null;
+    }
+
+    // 獲取主鍵欄位名稱
+    function getKeyAttribute(table) {
+      switch(table) {
+        case 'fruits':
+          return 'fruit_id';
+        case 'members':
+        case 'inactive':
+          return 'member_id';
+        case 'suppliers':
+          return 'supplier_id';
+        case 'transactions':
+          return 'transaction_id'; // 假設有一個單一的主鍵
+        default:
+          return '';
+      }
+    }
+  </script>
+</body>
+</html>
