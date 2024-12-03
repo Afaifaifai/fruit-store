@@ -115,7 +115,9 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "無效的 API 路徑", http.StatusBadRequest)
 		return
 	}
-	apiResource := pathParts[2]
+
+	api_table, api_method := pathParts[len(pathParts)-2], pathParts[len(pathParts)-1]
+	fmt.Printf("%s %s\n", api_table, api_method)
 
 	// 讀取請求體
 	body, err := ioutil.ReadAll(r.Body)
@@ -125,6 +127,7 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
+	fmt.Println(r.Method)
 	// 如果內容類型是 JSON，則解析並打印
 	if strings.Contains(r.Header.Get("Content-Type"), "application/json") {
 		var jsonData interface{}
@@ -134,12 +137,21 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			prettyJSON, _ := json.MarshalIndent(jsonData, "", "  ")
 			// log.Printf("收到 JSON 請求資源: %s\n內容:\n%s\n", apiResource, string(prettyJSON))
-			fmt.Printf("收到 JSON 請求資源: %s\n內容:\n%s\n", apiResource, string(prettyJSON))
+			fmt.Printf("收到 JSON 請求資源: %s %s\n內容:\n%s\n", api_table, api_method, string(prettyJSON))
 		}
 	} else {
 		// 否則，作為純文字打印
 		// log.Printf("收到非 JSON 請求資源: %s\n內容:\n%s\n", apiResource, string(body))
-		fmt.Printf("收到非 JSON 請求資源: %s\n內容:\n%s\n", apiResource, string(body))
+		// fmt.Printf("收到非 JSON 請求資源: %s\n內容:\n%s\n", apiResource, string(body))
+		var jsonData interface{}
+		if err := json.Unmarshal(body, &jsonData); err != nil {
+			log.Printf("收到非有效 JSON 格式的請求: %s", err)
+			fmt.Println("收到非有效 JSON 格式的請求")
+		} else {
+			prettyJSON, _ := json.MarshalIndent(jsonData, "", "  ")
+			// log.Printf("收到 JSON 請求資源: %s\n內容:\n%s\n", apiResource, string(prettyJSON))
+			fmt.Printf("收到 JSON 請求資源: %s %s\n內容:\n%s\n", api_table, api_method, string(prettyJSON))
+		}
 	}
 
 	// 回應客戶端

@@ -19,52 +19,58 @@ function loadData(table) {
 // 從後端 API 獲取資料
 async function fetchData(table) {
   try {
-    const response = await fetch(`${API_BASE_URL}/${table}`);
+    const response = await fetch(`${API_BASE_URL}/${table}/all` , {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     if (!response.ok) {
+      alert(11)
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     const data = await response.json();
     renderTable(table, data);
   } catch (error) {
     console.error('資料加載失敗:', error);
-    alert('無法加載資料，請檢查後端伺服器狀態！');
+    alert('無法加載資料，請檢查後端伺服器狀態！' + error);
   }
 }
 
 // 渲染表格內容
 function renderTable(table, data) {
-  const tableBody = document.querySelector(`#${table} tbody`);
-  tableBody.innerHTML = '';
-  data.forEach(row => {
-    const tr = document.createElement('tr');
-    Object.entries(row).forEach(([key, value]) => {
-      const td = document.createElement('td');
-      if (key.toLowerCase() === 'photo') { // 處理圖片欄位
-        const img = document.createElement('img');
-        img.src = value;
-        td.appendChild(img);
-      } else {
-        td.textContent = value;
-        // 為住址欄位添加工具提示
-        if ((table === 'members' || table === 'inactive') && key.toLowerCase() === 'address') {
-          td.setAttribute('title', value);
-        }
-      }
-      tr.appendChild(td);
-    });
-    tableBody.appendChild(tr);
-  });
+  // const tableBody = document.querySelector(`#${table} tbody`);
+  // tableBody.innerHTML = '';
+  // data.forEach(row => {
+  //   const tr = document.createElement('tr');
+  //   Object.entries(row).forEach(([key, value]) => {
+  //     const td = document.createElement('td');
+  //     if (key.toLowerCase() === 'photo') { // 處理圖片欄位
+  //       const img = document.createElement('img');
+  //       img.src = value;
+  //       td.appendChild(img);
+  //     } else {
+  //       td.textContent = value;
+  //       // 為住址欄位添加工具提示
+  //       if ((table === 'members' || table === 'inactive') && key.toLowerCase() === 'address') {
+  //         td.setAttribute('title', value);
+  //       }
+  //     }
+  //     tr.appendChild(td);
+  //   });
+  //   tableBody.appendChild(tr);
+  // });
 
-  // 添加行點擊事件以選擇記錄
-  tableBody.querySelectorAll('tr').forEach(tr => {
-    tr.addEventListener('click', () => {
-      if (selectedRow) {
-        selectedRow.classList.remove('selected');
-      }
-      selectedRow = tr;
-      selectedRow.classList.add('selected');
-    });
-  });
+  // // 添加行點擊事件以選擇記錄
+  // tableBody.querySelectorAll('tr').forEach(tr => {
+  //   tr.addEventListener('click', () => {
+  //     if (selectedRow) {
+  //       selectedRow.classList.remove('selected');
+  //     }
+  //     selectedRow = tr;
+  //     selectedRow.classList.add('selected');
+  //   });
+  // });
 }
 
 // 開啟 Modal
@@ -737,7 +743,7 @@ document.getElementById('modal-form').addEventListener('submit', function(event)
         // 更新數值部分
         const updateKey = key.replace('update_', '');
         if (value) 
-          updates[updateKey] = value; // 忽略空值
+          updates[updateKey] = value; // 忽略空值2;
       } else {
         // 其他操作，例如新增或查詢
         data[key] = value;
@@ -760,7 +766,7 @@ document.getElementById('modal-form').addEventListener('submit', function(event)
         }
       }).catch(error => {
         console.error('查詢失敗:', error);
-        alert('查詢失敗，請稍後再試。');
+        alert('查詢失敗，請稍後再試。' + error);
       });
     } else if (operation === 'edit' || operation === 'delete') {  // 修改和刪除
       // 修改或刪除操作
@@ -775,11 +781,11 @@ document.getElementById('modal-form').addEventListener('submit', function(event)
         }
         updateRecord(table, { conditions, updates });
       } else if (operation === 'delete') {
-        if (Object.keys(conditions).length === 0) {
-          alert('請提供至少一個刪除條件！');
+        if (Object.keys(data).length === 0) {
+          alert('請提供至少一個刪除條件zzzz！');
           return;
         }
-        deleteRecord(table, conditions);
+        deleteRecord(table, data);
       }
       closeModal();
     } else {  //  新增
@@ -832,8 +838,8 @@ function getCurrentTable() {
 // 新增資料
 async function createRecord(table, data) {
   try {
-    const response = await fetch(`${API_BASE_URL}/${table}`, {
-      method: 'POST',
+    const response = await fetch(`${API_BASE_URL}/${table}/insert`, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -903,8 +909,8 @@ async function deleteRecord(table, data) {
      }
    });
  
-   if (Object.keys(conditions).length === 0) {
-     alert('請提供至少一個刪除條件！');
+   if (Object.keys(data).length === 0) {
+     alert('請提供至少一個刪除條件aaa！' + data);
      return;
    }
 
@@ -915,12 +921,12 @@ async function deleteRecord(table, data) {
   }
  
    try {
-     const response = await fetch(`${API_BASE_URL}/${table}`, {
+     const response = await fetch(`${API_BASE_URL}/${table}/delete`, {
        method: 'DELETE',
        headers: {
          'Content-Type': 'application/json',
        },
-       body: JSON.stringify(conditions),
+       body: JSON.stringify(data),
      });
  
      if (response.ok) {
@@ -945,7 +951,7 @@ async function transferRecord(table, data) {
     return;
   }
   try {
-    const response = await fetch(`${API_BASE_URL}/transfer`, {
+    const response = await fetch(`${API_BASE_URL}/${table}/transfer`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -969,27 +975,35 @@ async function transferRecord(table, data) {
 // 查詢資料
 async function selectRecord(table, data) {
   // 根據表格類型和查詢條件發送 GET 請求
-  let query = '';
-  Object.entries(data).forEach(([key, value]) => {
-    if (value) { // 只有在有值的情況下才添加到查詢
-      query += `${encodeURIComponent(key)}=${encodeURIComponent(value)}&`;
-    }
-  });
+  // let query = '';
+  // Object.entries(data).forEach(([key, value]) => {
+  //   if (value) { // 只有在有值的情況下才添加到查詢
+  //     query += `${encodeURIComponent(key)}=${encodeURIComponent(value)}&`;
+  //   }
+  // });
 
-  // 如果沒有條件，阻止查詢
-  if (query === '') {
-    alert('請提供至少一個查詢條件！');
-    return [];
-  }
+  // // 如果沒有條件，阻止查詢
+  // if (query === '') {
+  //   alert('請提供至少一個查詢條件！');
+  //   return [];
+  // }
   
-  // 去掉最後的 &
-  query = query.slice(0, -1);
+  // // 去掉最後的 &
+  // query = query.slice(0, -1);
   
   try {
-    const response = await fetch(`${API_BASE_URL}/${table}?${query}`);
+    const response = await fetch(`${API_BASE_URL}/${table}/select`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // alert(JSON.stringify(response));
+
     if (response.ok) {
       const data = await response.json();
-      renderTable(table, data);
+      renderTable(table, data); // BUG : forEach
       alert('查詢成功！');
       return data; // 返回查詢結果
     } else {
@@ -999,7 +1013,7 @@ async function selectRecord(table, data) {
     }
   } catch (error) {
     console.error('查詢資料失敗:', error);
-    alert('無法查詢資料，請檢查後端伺服器狀態！');
+    alert('無法查詢資料，請檢查後端伺服器狀態！' + error);
     return [];
   }
 }
@@ -1007,7 +1021,7 @@ async function selectRecord(table, data) {
 // 列印資料（展示表格中的所有內容）
 async function printTable(table) {
   try {
-    const response = await fetch(`${API_BASE_URL}/${table}`);
+    const response = await fetch(`${API_BASE_URL}/${table}/all`);
     if (response.ok) {
       const data = await response.json();
       renderTable(table, data);
