@@ -997,6 +997,7 @@ async function selectRecord(table, data) {
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify(data)
     });
 
     // alert(JSON.stringify(response));
