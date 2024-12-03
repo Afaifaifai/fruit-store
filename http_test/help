@@ -1,3 +1,0 @@
-npm install -g http-server
-cd /path/to/your/file
-http-server -p 3000

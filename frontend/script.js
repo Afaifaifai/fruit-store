@@ -731,20 +731,18 @@ document.getElementById('modal-form').addEventListener('submit', function(event)
       if (key.startsWith('condition_')) {
         // 條件部分
         const conditionKey = key.replace('condition_', '');
-        if (value) 
-          conditions[conditionKey] = value; // 忽略空值
+        if (value) conditions[conditionKey] = value; // 忽略空值
       } else if (key.startsWith('update_')) {
         // 更新數值部分
         const updateKey = key.replace('update_', '');
-        if (value) 
-          updates[updateKey] = value; // 忽略空值
+        if (value) updates[updateKey] = value; // 忽略空值
       } else {
         // 其他操作，例如新增或查詢
         data[key] = value;
       }
     });
   
-    if (operation === 'select') {  // 查詢
+    if (operation === 'select') {
       // 普通查詢操作
       selectRecord(table, data).then(selectedData => {
         if (selectedData.length === 1 && pendingOperation) {
@@ -762,7 +760,7 @@ document.getElementById('modal-form').addEventListener('submit', function(event)
         console.error('查詢失敗:', error);
         alert('查詢失敗，請稍後再試。');
       });
-    } else if (operation === 'edit' || operation === 'delete') {  // 修改和刪除
+    } else if (operation === 'edit' || operation === 'delete') {
       // 修改或刪除操作
       if (operation === 'edit') {
         if (Object.keys(conditions).length === 0) {
@@ -782,7 +780,7 @@ document.getElementById('modal-form').addEventListener('submit', function(event)
         deleteRecord(table, conditions);
       }
       closeModal();
-    } else {  //  新增
+    } else {
       // 其他操作（add）
       if (operation === 'add') {
         // 處理圖片上傳（將圖片轉換為 Base64 字符串）
