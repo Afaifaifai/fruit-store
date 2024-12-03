@@ -481,7 +481,7 @@
         pendingOperation = action;
         pendingTable = table;
         
-        modalTitle.textContent = `${action === 'add' ? '新增' : action === 'select' ? '查詢'}資料`;
+        modalTitle.textContent = `${action === 'add' ? '新增' : action === 'select' ? '查詢' : ''}資料`;
         modalForm.innerHTML = generateForm(table, action);
         modal.style.display = 'block';
       }
