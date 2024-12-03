@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>前後端交互示範</title>
+</head>
+<body>
+    <h1>前後端交互示範</h1>
+    <button id="fetchButton">從後端獲取數據</button>
+    <div id="result"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fetchButton = document.getElementById('fetchButton');
+            const resultDiv = document.getElementById('result');
+
+            fetchButton.addEventListener('click', () => {
+                console.log("按鈕被點擊，發送 fetch 請求...");
+                // 使用後端伺服器的完整 URL
+                fetch('http://localhost:8080/api/hello', {
+                    method: 'GET',
+                    credentials: 'include' // 如果需要攜帶憑證
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('網路回應不是 OK');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("接收到的數據:", data);
+                        resultDiv.innerHTML = `<p>訊息: ${data.message}</p><p>時間: ${data.time}</p>`;
+                    })
+                    .catch(error => {
+                        console.error('錯誤:', error);
+                        resultDiv.innerHTML = `<p style="color: red;">錯誤: ${error.message}</p>`;
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
