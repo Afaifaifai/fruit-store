@@ -30,7 +30,7 @@ func Init() {
 
 	// Check and initialize tables
 	for table_name, table_content := range TABLES {
-		err = ensure_table_exists(db, table_name, table_content)
+		err = ensure_table_exists(db, table_name, table_content, RESET_TABLES)
 		if err != nil {
 			log.Fatalf("Failed to initialize the table %s: %v", table_name, err)
 		}
@@ -64,7 +64,16 @@ func ensure_database_exists(db *sql.DB, database_name string) error {
 }
 
 // Ensure the table exists function
-func ensure_table_exists(db *sql.DB, table_name string, table_content string) error {
+func ensure_table_exists(db *sql.DB, table_name string, table_content string, reset_table bool) error {
+	if reset_table {
+		query := fmt.Sprintf("DROP TABLE IF EXISTS %s", table_name)
+		fmt.Println(query)
+		_, err := db.Exec(query)
+		if err != nil {
+			return fmt.Errorf("failed to drop the table: %v", err)
+		}
+	}
+
 	// Check if the table exists
 	query := fmt.Sprintf("SHOW TABLES LIKE '%s'", table_name)
 	var result string
