@@ -15,7 +15,7 @@ func Init() {
 	}
 	// defer db_server.Close()
 
-	err = ensure_database_exists(db_server, DATABASE_NAME)
+	err = ensure_database_exists(db_server, DATABASE_NAME, RESET_DATABASE)
 	if err != nil {
 		log.Fatalf("Failed to initialize the database: %v", err)
 	}
@@ -29,16 +29,29 @@ func Init() {
 	defer db.Close()
 
 	// Check and initialize tables
-	for table_name, table_content := range TABLES {
-		err = ensure_table_exists(db, table_name, table_content, RESET_TABLES)
+	for _, table := range Tables {
+		fmt.Println("\n" + table.name)
+		err = ensure_table_exists(db, table.name, table.create)
 		if err != nil {
-			log.Fatalf("Failed to initialize the table %s: %v", table_name, err)
+			log.Fatalf("Failed to initialize the table %s: %v", table.name, err)
+		}
+
+		err = ensure_table_has_data(db, table)
+		if err != nil {
+			log.Fatalf("Failed to insert data into the table %s: %v", table.name, err)
 		}
 	}
 	fmt.Println("Database and tables initialization complete!")
 }
 
-func ensure_database_exists(db *sql.DB, database_name string) error {
+func ensure_database_exists(db *sql.DB, database_name string, reset_db bool) error {
+	if reset_db {
+		_, err := db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", database_name))
+		if err != nil {
+			return fmt.Errorf("failed to drop the database: %v", err)
+		}
+	}
+
 	// Check if the database exists
 	query := fmt.Sprintf("SHOW DATABASES LIKE '%s'", database_name)
 	fmt.Println(query)
@@ -64,16 +77,7 @@ func ensure_database_exists(db *sql.DB, database_name string) error {
 }
 
 // Ensure the table exists function
-func ensure_table_exists(db *sql.DB, table_name string, table_content string, reset_table bool) error {
-	if reset_table {
-		query := fmt.Sprintf("DROP TABLE IF EXISTS %s", table_name)
-		fmt.Println(query)
-		_, err := db.Exec(query)
-		if err != nil {
-			return fmt.Errorf("failed to drop the table: %v", err)
-		}
-	}
-
+func ensure_table_exists(db *sql.DB, table_name string, table_content string) error {
 	// Check if the table exists
 	query := fmt.Sprintf("SHOW TABLES LIKE '%s'", table_name)
 	var result string
@@ -92,6 +96,32 @@ func ensure_table_exists(db *sql.DB, table_name string, table_content string, re
 		fmt.Printf("The table %s has been created successfully!\n", table_name)
 	} else {
 		fmt.Printf("The table %s already exists.\n", table_name)
+	}
+
+	return nil
+}
+
+func ensure_table_has_data(db *sql.DB, table Table) error {
+	// 检查表中的记录数
+	var count int
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM %s", table.name)
+	err := db.QueryRow(countQuery).Scan(&count)
+	if err != nil {
+		return fmt.Errorf("Failed to get row count for table %s: %v", table.name, err)
+	}
+
+	// 如果记录数少于或等于3，插入数据
+	if count <= 3 {
+		fmt.Printf("Table %s has %d records, inserting data...\n", table.name, count)
+		for i, insertQuery := range table.insert {
+			_, err := db.Exec(insertQuery)
+			if err != nil {
+				return fmt.Errorf("Failed to insert data into table %s: %v", table.name, err)
+			}
+			fmt.Printf("Inserted data %d into table %s successfully!\n", i+1, table.name)
+		}
+	} else {
+		fmt.Printf("Table %s already has sufficient records.\n", table.name)
 	}
 
 	return nil
