@@ -147,26 +147,26 @@ function generateFruitsForm(table, action) {
       <label for="fruit_id">水果編號 <span style="color:red;">*</span>:</label>
       <input type="text" id="fruit_id" name="fruit_id" maxlength="13" pattern="\\d{2}-\\d{3}-\\d{3}-\\d{2}" ${required}>
 
-      <label for="fruit_name">水果名稱:</label>
-      <input type="text" id="fruit_name" name="fruit_name" maxlength="12">
+      <label for="fruit_name">水果名稱 <span style="color:red;">*</span>:</label>
+      <input type="text" id="fruit_name" name="fruit_name" maxlength="12" ${required}>
 
-      <label for="supplier_name">水果供應商名稱:</label>
-      <input type="text" id="supplier_name" name="supplier_name" maxlength="12">
+      <label for="supplier_name">水果供應商名稱 <span style="color:red;">*</span>:</label>
+      <input type="text" id="supplier_name" name="supplier_name" maxlength="12" ${required}>
 
       <label for="quantity">現有數量:</label>
       <input type="number" id="quantity" name="quantity" max="999999">
 
-      <label for="unit">單位:</label>
-      <input type="text" id="unit" name="unit" maxlength="4">
+      <label for="unit">單位 <span style="color:red;">*</span>:</label>
+      <input type="text" id="unit" name="unit" maxlength="4" ${required}>
 
       <label for="purchase_price">進貨單價:</label>
       <input type="number" step="0.01" id="purchase_price" name="purchase_price" max="999999.99">
 
-      <label for="storage_location">公司內存放位置:</label>
-      <input type="text" id="storage_location" name="storage_location" maxlength="12">
+      <label for="storage_location">公司內存放位置 <span style="color:red;">*</span>:</label>
+      <input type="text" id="storage_location" name="storage_location" maxlength="12" ${required}>
 
-      <label for="purchase_date">進貨日期:</label>
-      <input type="date" id="purchase_date" name="purchase_date">
+      <label for="purchase_date">進貨日期 <span style="color:red;">*</span>:</label>
+      <input type="date" id="purchase_date" name="purchase_date" ${required}>
 
       <label for="promotion_start_date">開始促銷日期:</label>
       <input type="date" id="promotion_start_date" name="promotion_start_date">
@@ -284,20 +284,20 @@ function generateMembersForm(table, action) {
       <label for="member_id">會員身分證字號 <span style="color:red;">*</span>:</label>
       <input type="text" id="member_id" name="member_id" maxlength="10" pattern="[A-Z]{1}\\d{9}" ${required}>
 
-      <label for="member_name">會員姓名:</label>
-      <input type="text" id="member_name" name="member_name" maxlength="12">
+      <label for="member_name">會員姓名 <span style="color:red;">*</span>:</label>
+      <input type="text" id="member_name" name="member_name" maxlength="12" ${required}>
 
       <label for="phone">電話:</label>
-      <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+      <input type="text" id="phone_number" name="phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
       <label for="mobile">手機號碼:</label>
-      <input type="text" id="mobile" name="mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}">
+      <input type="text" id="mobile_number" name="mobile_number" maxlength="16" pattern="\\d{4}\\d{3}\\d{3}">
 
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" maxlength="36">
+      <label for="email">Email <span style="color:red;">*</span>:</label>
+      <input type="email" id="email" name="email" maxlength="36" ${required}>
 
       <label for="line_joined">是否加入Line:</label>
-      <select id="line_joined" name="line_joined">
+      <select id="joined_line" name="joined_line">
         <option value="">請選擇</option>
         <option value="是">是</option>
         <option value="不是">不是</option>
@@ -313,7 +313,7 @@ function generateMembersForm(table, action) {
       <input type="file" id="photo" name="photo" accept="image/*">
 
       <label for="discount">會員折扣:</label>
-      <input type="number" step="0.01" id="discount" name="discount" min="0" max="9.99">
+      <input type="number" step="0.01" id="discount" name="discount" min="0" max="1.00">
     `;
   } else if (action === 'select' || action === 'delete') {
     // 查詢或修改模式，所有欄位均為選填
@@ -325,16 +325,16 @@ function generateMembersForm(table, action) {
       <input type="text" id="member_name" name="member_name" maxlength="12">
 
       <label for="phone">電話:</label>
-      <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+      <input type="text" id="phone_number" name="phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
       <label for="mobile">手機號碼:</label>
-      <input type="text" id="mobile" name="mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}">
+      <input type="text" id="mobile_number" name="mobile_number" maxlength="16" pattern="\\d{4}\\d{3}\\d{3}">
 
       <label for="email">Email:</label>
       <input type="email" id="email" name="email" maxlength="36">
 
       <label for="line_joined">是否加入Line:</label>
-      <select id="line_joined" name="line_joined">
+      <select id="joined_line" name="joined_line">
         <option value="">請選擇</option>
         <option value="是">是</option>
         <option value="不是">不是</option>
@@ -346,11 +346,8 @@ function generateMembersForm(table, action) {
       <label for="age">年齡:</label>
       <input type="number" id="age" name="age" min="0" max="9999">
 
-      <label for="photo">照片:</label>
-      <input type="file" id="photo" name="photo" accept="image/*">
-
       <label for="discount">會員折扣:</label>
-      <input type="number" step="0.01" id="discount" name="discount" min="0" max="9.99">
+      <input type="number" step="0.01" id="discount" name="discount" min="0" max="1.00">
     `;
   } else if (action === 'edit') {
     // 修改操作的表單：分為條件和修改數值兩個部分
@@ -364,16 +361,16 @@ function generateMembersForm(table, action) {
         <input type="text" id="condition_member_name" name="condition_member_name" maxlength="12">
 
         <label for="condition_phone">電話:</label>
-        <input type="text" id="condition_phone" name="condition_phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+        <input type="text" id="condition_phone_number" name="condition_phone" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
         <label for="condition_mobile">手機號碼:</label>
-        <input type="text" id="condition_mobile" name="condition_mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}">
+        <input type="text" id="condition_mobile_number" name="condition_mobile_number" maxlength="16" pattern="\\d{4}\\d{3}\\d{3}">
 
         <label for="condition_email">Email:</label>
         <input type="email" id="condition_email" name="condition_email" maxlength="36">
 
         <label for="condition_line_joined">是否加入Line:</label>
-        <select id="condition_line_joined" name="condition_line_joined">
+        <select id="condition_joined_line" name="condition_joined_line">
           <option value="">請選擇</option>
           <option value="是">是</option>
           <option value="不是">不是</option>
@@ -386,7 +383,7 @@ function generateMembersForm(table, action) {
         <input type="number" id="condition_age" name="condition_age" min="0" max="9999">
 
         <label for="condition_discount">會員折扣:</label>
-        <input type="number" step="0.01" id="condition_discount" name="condition_discount" min="0" max="9.99">
+        <input type="number" step="0.01" id="condition_discount" name="condition_discount" min="0" max="1.00">
       </div>
 
       <h3>修改數值</h3>
@@ -398,16 +395,16 @@ function generateMembersForm(table, action) {
         <input type="text" id="update_member_name" name="update_member_name" maxlength="12">
 
         <label for="update_phone">電話:</label>
-        <input type="text" id="update_phone" name="update_phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+        <input type="text" id="update_phone" name="update_phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
         <label for="update_mobile">手機號碼:</label>
-        <input type="text" id="update_mobile" name="update_mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}">
+        <input type="text" id="update_mobile_number" name="update_mobile_number" maxlength="16" pattern="\\d{4}\\d{3}\\d{3}">
 
         <label for="update_email">Email:</label>
         <input type="email" id="update_email" name="update_email" maxlength="36">
 
         <label for="update_line_joined">是否加入Line:</label>
-        <select id="update_line_joined" name="update_line_joined">
+        <select id="update_joined_line" name="update_joined_line">
           <option value="">請選擇</option>
           <option value="是">是</option>
           <option value="不是">不是</option>
@@ -419,8 +416,11 @@ function generateMembersForm(table, action) {
         <label for="update_age">年齡:</label>
         <input type="number" id="update_age" name="update_age" min="0" max="9999">
 
+        <label for="photo">照片:</label>
+        <input type="file" id="update_photo" name="update_photo" accept="image/*">
+
         <label for="update_discount">會員折扣:</label>
-        <input type="number" step="0.01" id="update_discount" name="update_discount" min="0" max="9.99">
+        <input type="number" step="0.01" id="update_discount" name="update_discount" min="0" max="1.00">
       </div>
     `;
   }
@@ -440,22 +440,22 @@ function generateSuppliersForm(table, action) {
   if (action === 'add') {
     formHTML += `
       <label for="supplier_id">供應商統一編號 <span style="color:red;">*</span>:</label>
-      <input type="text" id="supplier_id" name="supplier_id" maxlength="8" pattern="\\d{8}" ${action === 'add' ? required : ''}>
+      <input type="text" id="supplier_id" name="supplier_id" maxlength="8" pattern="\\d{8}" ${required}>
 
-      <label for="supplier_name">水果供應商名稱:</label>
-      <input type="text" id="supplier_name" name="supplier_name" maxlength="12">
+      <label for="supplier_name">水果供應商名稱 <span style="color:red;">*</span>:</label>
+      <input type="text" id="supplier_name" name="supplier_name" maxlength="12" ${required}>
 
       <label for="phone">電話:</label>
-      <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+      <input type="text" id="phone_number" name="phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" maxlength="36">
+      <label for="email">Email <span style="color:red;">*</span>:</label>
+      <input type="email" id="email" name="email" maxlength="36" ${required}>
 
       <label for="address">住址:</label>
       <textarea id="address" name="address" maxlength="60"></textarea>
 
-      <label for="manager_name">負責人姓名:</label>
-      <input type="text" id="manager_name" name="manager_name" maxlength="12">
+      <label for="manager_name">負責人姓名 <span style="color:red;">*</span>:</label>
+      <input type="text" id="contact_name" name="contact_name" maxlength="12" ${required}>
     `;
   } else if (action === 'select' || action === 'delete') {
     // 查詢或刪除模式，所有欄位均為選填
@@ -467,7 +467,7 @@ function generateSuppliersForm(table, action) {
       <input type="text" id="supplier_name" name="supplier_name" maxlength="12">
 
       <label for="phone">電話:</label>
-      <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+      <input type="text" id="phone_number" name="phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
       <label for="email">Email:</label>
       <input type="email" id="email" name="email" maxlength="36">
@@ -476,7 +476,7 @@ function generateSuppliersForm(table, action) {
       <textarea id="address" name="address" maxlength="60"></textarea>
 
       <label for="manager_name">負責人姓名:</label>
-      <input type="text" id="manager_name" name="manager_name" maxlength="12">
+      <input type="text" id="contact_name" name="contact_name" maxlength="12">
     `;
   } else if (action === 'edit') {
     // 修改操作的表單：分為條件和修改數值兩個部分
@@ -490,7 +490,7 @@ function generateSuppliersForm(table, action) {
         <input type="text" id="condition_supplier_name" name="condition_supplier_name" maxlength="12">
 
         <label for="condition_phone">電話:</label>
-        <input type="text" id="condition_phone" name="condition_phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+        <input type="text" id="condition_phone_number" name="condition_phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
         <label for="condition_email">Email:</label>
         <input type="email" id="condition_email" name="condition_email" maxlength="36">
@@ -499,7 +499,7 @@ function generateSuppliersForm(table, action) {
         <textarea id="condition_address" name="condition_address" maxlength="60"></textarea>
 
         <label for="condition_manager_name">負責人姓名:</label>
-        <input type="text" id="condition_manager_name" name="condition_manager_name" maxlength="12">
+        <input type="text" id="condition_contact_name" name="condition_contact_name" maxlength="12">
       </div>
 
       <h3>修改數值</h3>
@@ -511,7 +511,7 @@ function generateSuppliersForm(table, action) {
         <input type="text" id="update_supplier_name" name="update_supplier_name" maxlength="12">
 
         <label for="update_phone">電話:</label>
-        <input type="text" id="update_phone" name="update_phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+        <input type="text" id="update_phone_number" name="update_phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
         <label for="update_email">Email:</label>
         <input type="email" id="update_email" name="update_email" maxlength="36">
@@ -520,7 +520,7 @@ function generateSuppliersForm(table, action) {
         <textarea id="update_address" name="update_address" maxlength="60"></textarea>
 
         <label for="update_manager_name">負責人姓名:</label>
-        <input type="text" id="update_manager_name" name="update_manager_name" maxlength="12">
+        <input type="text" id="update_contact_name" name="update_contact_name" maxlength="12">
       </div>
     `;
   }
@@ -536,26 +536,26 @@ function generateTransactionsForm(table, action) {
       <label for="fruit_id">水果編號 <span style="color:red;">*</span>:</label>
       <input type="text" id="fruit_id" name="fruit_id" maxlength="13" pattern="\\d{2}-\\d{3}-\\d{3}-\\d{2}" ${required}>
 
-      <label for="member_id">會員身分證字號:</label>
-      <input type="text" id="member_id" name="member_id" maxlength="10" pattern="[A-Z]{1}\\d{9}">
+      <label for="member_id">會員身分證字號 <span style="color:red;">*</span>:</label>
+      <input type="text" id="member_id" name="member_id" maxlength="10" pattern="[A-Z]{1}\\d{9}" ${required}>
 
-      <label for="fruit_name">水果名稱:</label>
-      <input type="text" id="fruit_name" name="fruit_name" maxlength="12">
+      <label for="fruit_name">水果名稱 <span style="color:red;">*</span>:</label>
+      <input type="text" id="fruit_name" name="fruit_name" maxlength="12" ${required}>
 
-      <label for="supplier_name">水果供應商名稱:</label>
-      <input type="text" id="supplier_name" name="supplier_name" maxlength="12">
+      <label for="supplier_name">水果供應商名稱 <span style="color:red;">*</span>:</label>
+      <input type="text" id="supplier_name" name="supplier_name" maxlength="12" ${required}>
 
-      <label for="purchase_quantity">購買數量:</label>
-      <input type="number" id="purchase_quantity" name="purchase_quantity" max="999999">
+      <label for="purchase_quantity">購買數量 <span style="color:red;">*</span>:</label>
+      <input type="number" id="purchase_quantity" name="purchase_quantity" max="999999" ${required}>
 
-      <label for="sale_price">出售單價:</label>
-      <input type="number" step="0.01" id="sale_price" name="sale_price" max="999999.99">
+      <label for="sale_price">出售單價 <span style="color:red;">*</span>:</label>
+      <input type="number" step="0.01" id="sale_price" name="sale_price" max="999999.99" ${required}>
 
-      <label for="transaction_date">交易日期:</label>
-      <input type="date" id="transaction_date" name="transaction_date">
+      <label for="transaction_date">交易日期 <span style="color:red;">*</span>:</label>
+      <input type="date" id="transaction_date" name="transaction_date" ${required}>
 
-      <label for="expected_shipping_date">預計交運日期:</label>
-      <input type="date" id="expected_shipping_date" name="expected_shipping_date">
+      <label for="expected_shipping_date">預計交運日期 <span style="color:red;">*</span>:</label>
+      <input type="date" id="expected_shipping_date" name="expected_shipping_date" ${required}>
 
       <label for="actual_shipping_date">實際交運日期:</label>
       <input type="date" id="actual_shipping_date" name="actual_shipping_date"  >
@@ -768,26 +768,29 @@ document.getElementById('modal-form').addEventListener('submit', function(event)
         console.error('查詢失敗:', error);
         alert('查詢失敗，請稍後再試。' + error);
       });
-    } else if (operation === 'edit' || operation === 'delete') {  // 修改和刪除
-      // 修改或刪除操作
-      if (operation === 'edit') {
-        if (Object.keys(conditions).length === 0) {
-          alert('請至少提供一個條件！');
-          return;
+    } else if (operation === 'edit') {
+      const photoInput = form.querySelector('input[type="file"]');
+        if (photoInput && photoInput.files.length > 0) {
+          const file = photoInput.files[0];
+          const reader = new FileReader();
+          reader.onloadend = function() {
+            // if (reader.result.length != 0) ///////////////////////
+            updates['photo'] = reader.result; // 將圖片轉換為 Base64
+            // alert(reader.result);
+            updateRecord(table, { conditions, updates });
+          };
+          reader.readAsDataURL(file);
+        } else if (photoInput && photoInput.files.length == 0) {
+          updates['photo'] = "";
+          updateRecord(table, { conditions, updates });
+        } else {
+          updateRecord(table, { conditions, updates });
         }
-        if (Object.keys(updates).length === 0) {
-          alert('請至少提供一個修改數值！');
-          return;
-        }
-        updateRecord(table, { conditions, updates });
-      } else if (operation === 'delete') {
-        if (Object.keys(data).length === 0) {
-          alert('請提供至少一個刪除條件zzzz！');
-          return;
-        }
-        deleteRecord(table, data);
-      }
-      closeModal();
+      
+
+    } else if (operation === 'delete') {
+      deleteRecord(table, data);
+      // closeModal();
     } else {  //  新增
       // 其他操作（add）
       if (operation === 'add') {
@@ -797,15 +800,20 @@ document.getElementById('modal-form').addEventListener('submit', function(event)
           const file = photoInput.files[0];
           const reader = new FileReader();
           reader.onloadend = function() {
+            // if (reader.result.length != 0) ///////////////////////
             data['photo'] = reader.result; // 將圖片轉換為 Base64
+            // alert(reader.result);
             createRecord(table, data);
           };
           reader.readAsDataURL(file);
+        } else if (photoInput && photoInput.files.length == 0) {
+          data['photo'] = ''
+          createRecord(table, data)
         } else {
           createRecord(table, data);
         }
       }
-      closeModal();
+      // closeModal();
     }
 });
 
@@ -908,8 +916,10 @@ async function deleteRecord(table, data) {
        conditions[key] = value;
      }
    });
+   const conditionsStr = JSON.stringify(conditions);
+   alert(conditionsStr);
  
-   if (Object.keys(data).length === 0) {
+   if (Object.keys(conditions).length === 0) {
      alert('請提供至少一個刪除條件aaa！' + data);
      return;
    }
@@ -922,11 +932,11 @@ async function deleteRecord(table, data) {
  
    try {
      const response = await fetch(`${API_BASE_URL}/${table}/delete`, {
-       method: 'DELETE',
+       method: 'PUT',
        headers: {
          'Content-Type': 'application/json',
        },
-       body: JSON.stringify(data),
+       body: JSON.stringify(conditions),
      });
  
      if (response.ok) {
@@ -1022,7 +1032,14 @@ async function selectRecord(table, data) {
 // 列印資料（展示表格中的所有內容）
 async function printTable(table) {
   try {
-    const response = await fetch(`${API_BASE_URL}/${table}/all`);
+    const response = await fetch(`${API_BASE_URL}/${table}/all`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+
     if (response.ok) {
       const data = await response.json();
       renderTable(table, data);

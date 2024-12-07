@@ -1,9 +1,10 @@
 package main
 
 type Table struct {
-	name   string
-	create string
-	insert []string
+	name               string
+	create             string
+	insert             []string
+	display_attributes []string
 }
 
 var fruits Table = Table{
@@ -20,7 +21,8 @@ var fruits Table = Table{
 		storage_location VARCHAR(12) NOT NULL,    															-- 公司內存放位置 (最多 12 個字元)
 		purchase_date DATE NOT NULL,              															-- 進貨日期
 		promotion_start_date DATE,                															-- 開始促銷日期
-		discard_date DATE                         															-- 該丟棄之日期
+		discard_date DATE,                         															-- 該丟棄之日期
+		display TINYINT(1) NOT NULL NOT NULL DEFAULT 1
 	)`,
 	insert: []string{
 		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date) 
@@ -29,6 +31,19 @@ var fruits Table = Table{
 		VALUES ('12-345-678-91', '蘋果', '銘傳水果公司司', 30, '粒', 10.00, '一樓冷藏倉庫', '2022-11-04', '2022-11-08', '2022-11-12')`,
 		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date)
 		VALUES ('12-345-678-92', '橘子', '銘傳水果公司司', 30, '粒', 10.00, '一樓冷藏倉庫', '2022-11-04', '2022-11-08', '2022-11-12')`,
+	},
+	display_attributes: []string{
+		"fruit_id",
+		"fruit_name",
+		"supplier_name",
+		"quantity",
+		"unit",
+		"purchase_price",
+		"total_value",
+		"storage_location",
+		"purchase_date",
+		"promotion_start_date",
+		"discard_date",
 	},
 }
 
@@ -44,8 +59,9 @@ var members Table = Table{
 		joined_line VARCHAR(8) DEFAULT '不是',
 		address VARCHAR(60),
 		age INT CHECK (age >= 0),
-		photo_base64 LONGTEXT, 
-		discount DECIMAL(3, 2) DEFAULT 1.00 CHECK (discount >= 0 AND discount <= 1)
+		photo LONGTEXT, -- Base64
+		discount DECIMAL(3, 2) DEFAULT 1.00 CHECK (discount >= 0 AND discount <= 1) DEFAULT 0.88,
+		display TINYINT(1) NOT NULL NOT NULL DEFAULT 1
 	)`,
 	insert: []string{
 		`INSERT INTO members (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
@@ -55,12 +71,24 @@ var members Table = Table{
 		`INSERT INTO members (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
 		VALUES ('C123456789', '二純純', '0423456666', '0910000001', 'yyxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88)`,
 	},
+	display_attributes: []string{
+		"member_id",
+		"member_name",
+		"phone_number",
+		"mobile_number",
+		"email",
+		"joined_line",
+		"address",
+		"age",
+		"photo",
+		"discount",
+	},
 }
 
-var inactive_members Table = Table{
-	name: "inactive_members",
+var inactive Table = Table{
+	name: "inactive",
 	create: `
-	CREATE TABLE inactive_members (
+	CREATE TABLE inactive (
 		member_id VARCHAR(10) PRIMARY KEY CHECK (member_id REGEXP '^[A-Z]{1}[0-9]{9}$'), -- 格式: 1 英文字母 + 9 數字
 		member_name VARCHAR(12) NOT NULL,
 		phone_number VARCHAR(16) CHECK (phone_number REGEXP '^[0-9]{1,16}$'),
@@ -69,16 +97,29 @@ var inactive_members Table = Table{
 		joined_line VARCHAR(8) DEFAULT '不是',
 		address VARCHAR(60),
 		age INT CHECK (age >= 0),
-		photo_base64 LONGTEXT, 
-		discount DECIMAL(3, 2) DEFAULT 1.00 CHECK (discount >= 0 AND discount <= 1)
+		photo LONGTEXT, -- Base64
+		discount DECIMAL(3, 2) DEFAULT 1.00 CHECK (discount >= 0 AND discount <= 1) DEFAULT 0.88,
+		display TINYINT(1) NOT NULL NOT NULL DEFAULT 1
 	)`,
 	insert: []string{
-		`INSERT INTO inactive_members (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
+		`INSERT INTO inactive (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
 		VALUES ('D123456789', '三純純', '0423456666', '0910000000', 'xxxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88)`,
-		`INSERT INTO inactive_members (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
+		`INSERT INTO inactive (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
 		VALUES ('E123456789', '四純純', '0423456666', '0910000001', 'yxxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88)`,
-		`INSERT INTO inactive_members (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
+		`INSERT INTO inactive (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
 		VALUES ('F123456789', '五純純', '0423456666', '0910000001', 'yyxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88)`,
+	},
+	display_attributes: []string{
+		"member_id",
+		"member_name",
+		"phone_number",
+		"mobile_number",
+		"email",
+		"joined_line",
+		"address",
+		"age",
+		"photo",
+		"discount",
 	},
 }
 
@@ -91,7 +132,8 @@ var suppliers Table = Table{
 		phone_number VARCHAR(16) CHECK (phone_number REGEXP '^[0-9]{1,16}$'),
 		email VARCHAR(36) NOT NULL,               									-- Email
 		address VARCHAR(60),                      									-- 住址
-		contact_name VARCHAR(12) NOT NULL         									-- 負責人姓名
+		contact_name VARCHAR(12) NOT NULL,         									-- 負責人姓名
+		display TINYINT(1) NOT NULL NOT NULL DEFAULT 1
 	)`,
 	insert: []string{
 		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
@@ -100,6 +142,14 @@ var suppliers Table = Table{
 		VALUES ('12345679', '山岸水果批發公司', 0423590122, 'ayyy@coast.com', '台中市仰德大道ZQ號', '王海西')`,
 		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
 		VALUES ('12345670', '天空水果批發公司', 0423590123, 'byyy@coast.com', '台中市仰德大道ZA號', '王海南')`,
+	},
+	display_attributes: []string{
+		"supplier_id",
+		"supplier_name",
+		"phone_number",
+		"email",
+		"address",
+		"contact_name",
 	},
 }
 
@@ -118,6 +168,7 @@ var transactions Table = Table{
 		transaction_date DATE NOT NULL,              									-- 交易日期
 		expected_shipping_date DATE NOT NULL,                							-- 預計交運日期
 		actual_shipping_date DATE,                         								-- 實際交運日期日期
+		display TINYINT(1) NOT NULL NOT NULL DEFAULT 1,
 		
 		CHECK (purchase_quantity >= 0 AND purchase_quantity <= 999999),
 
@@ -138,4 +189,27 @@ var transactions Table = Table{
 		`INSERT INTO transactions (fruit_id, member_id, fruit_name, supplier_name, purchase_quantity, sale_price, transaction_date, expected_shipping_date, actual_shipping_date) 
 		VALUES ('12-345-678-92', 'B187654321', '橘子', '天空水果批發公司', 22, 20.00, '2022-11-04', '2022-11-06', '2022-11-06')`,
 	},
+	display_attributes: []string{
+		"fruit_id",
+		"member_id",
+		"fruit_name",
+		"supplier_name",
+		"purchase_quantity",
+		"sale_price",
+		"total_price",
+		"price_after_discount",
+		"transaction_date",
+		"expected_shipping_date",
+		"actual_shipping_date",
+	},
+}
+
+var Digit_attributes map[string]string = map[string]string{
+	"quantity":          "30",
+	"purchase_price":    "10.00",
+	"age":               "20",
+	"discount":          "0.88",
+	"purchase_quantity": "20",
+	"sale_price":        "20.00",
+	"total_value":       "600.00",
 }

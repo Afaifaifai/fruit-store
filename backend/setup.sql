@@ -101,9 +101,11 @@ INSERT INTO transactions (fruit_id, member_id, fruit_name, supplier_name, purcha
         
 SELECT * FROM fruits;
 SELECT * FROM members;
-SELECT * FROM inactive_members;
+SELECT * FROM inactive;
 SELECT * FROM suppliers;
 SELECT * FROM transactions;
+
+SELECT fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, total_value, storage_location, purchase_date, promotion_start_date, discard_date FROM fruits WHERE display = 1;
 
 -- CREATE TABLE fruits (
 --     fruit_id VARCHAR(15) PRIMARY KEY,          -- 水果編號 (格式: YY-YYY-YYY-YY)
