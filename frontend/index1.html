@@ -5,213 +5,168 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>東海水果公司管理系統</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- 以下為新增的登入畫面樣式 -->
-  <style>
-    .login-overlay {
-      position: fixed;
-      z-index: 9999;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .login-box {
-      background: #fff;
-      padding: 20px;
-      border-radius: 5px;
-      text-align: center;
-    }
-    .login-box h2 {
-      margin-bottom: 15px;
-    }
-    .login-box input {
-      display: block;
-      margin: 10px auto;
-      padding: 8px;
-      width: 80%;
-    }
-    .login-box button {
-      padding: 10px 20px;
-      cursor: pointer;
-    }
-    .error-message {
-      color: red;
-      margin-top: 10px;
-      font-size: 0.9em;
-    }
-  </style>
 </head>
 <body>
-  <!-- 新增的登入畫面 (新增) -->
-  <div class="login-overlay" id="login-overlay">
-    <div class="login-box">
-      <h2>請登入</h2>
-      <input type="text" id="username" placeholder="帳號">
-      <input type="password" id="password" placeholder="密碼">
-      <button onclick="checkLogin()">登入</button>
-      <div class="error-message" id="login-error"></div>
-    </div>
+  <!-- 側邊選單 -->
+  <div class="sidebar">
+    <h2>系統選單</h2>
+    <button onclick="loadData('fruits')">水果資料表</button>
+    <button onclick="loadData('members')">會員資料表</button>
+    <button onclick="loadData('inactive')">靜止會員資料表</button>
+    <button onclick="loadData('suppliers')">供應商資料表</button>
+    <button onclick="loadData('transactions')">交易資料表</button>
   </div>
 
-  <!-- 在原本的程式內容外層多包一層div控制顯示隱藏(新增id=system-content) -->
-  <div id="system-content" style="display:none;">
-    <!-- 側邊選單 -->
-    <div class="sidebar">
-      <h2>系統選單</h2>
-      <button onclick="loadData('fruits')">水果資料表</button>
-      <button onclick="loadData('members')">會員資料表</button>
-      <button onclick="loadData('inactive')">靜止會員資料表</button>
-      <button onclick="loadData('suppliers')">供應商資料表</button>
-      <button onclick="loadData('transactions')">交易資料表</button>
+  <!-- 內容區域 -->
+  <div class="content">
+    <!-- 水果資料表 -->
+    <div id="fruits" class="table-container hidden">
+      <h2>水果資料表</h2>
+      <div class="action-buttons">
+        <button class="operation-btn" onclick="openModal('fruits', 'add')">新增</button>
+        <button class="operation-btn" onclick="openModal('fruits', 'select')">查詢</button>
+        <button class="operation-btn" onclick="openModal('fruits', 'edit')">修改</button>
+        <button class="operation-btn" onclick="openModal('fruits', 'delete')">刪除</button>
+        <button class="print-btn" onclick="printTable('fruits')">列印</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>水果編號</th>
+            <th>水果名稱</th>
+            <th>水果供應商名稱</th>
+            <th>現有數量</th>
+            <th>單位</th>
+            <th>進貨單價</th>
+            <th>現有價值小計</th>
+            <th>公司內存放位置</th>
+            <th>進貨日期</th>
+            <th>開始促銷日期</th>
+            <th>該丟棄之日期</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
 
-    <!-- 內容區域 -->
-    <div class="content">
-      <!-- 水果資料表 -->
-      <div id="fruits" class="table-container hidden">
-        <h2>水果資料表</h2>
-        <div class="action-buttons">
-          <button class="operation-btn" onclick="openModal('fruits', 'add')">新增</button>
-          <button class="operation-btn" onclick="openModal('fruits', 'select')">查詢</button>
-          <button class="operation-btn" onclick="openModal('fruits', 'edit')">修改</button>
-          <button class="operation-btn" onclick="openModal('fruits', 'delete')">刪除</button>
-          <button class="print-btn" onclick="printTable('fruits')">列印</button>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>水果編號</th>
-              <th>水果名稱</th>
-              <th>水果供應商名稱</th>
-              <th>現有數量</th>
-              <th>單位</th>
-              <th>進貨單價</th>
-              <th>現有價值小計</th>
-              <th>公司內存放位置</th>
-              <th>進貨日期</th>
-              <th>開始促銷日期</th>
-              <th>該丟棄之日期</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+    <!-- 會員資料表 -->
+    <div id="members" class="table-container hidden">
+      <h2>會員資料表</h2>
+      <div class="action-buttons">
+        <button class="operation-btn" onclick="openModal('members', 'add')">新增</button>
+        <button class="operation-btn" onclick="openModal('members', 'select')">查詢</button>
+        <button class="operation-btn" onclick="openModal('members', 'edit')">修改</button>
+        <button class="operation-btn" onclick="openModal('members', 'delete')">刪除</button>
+        <button class="print-btn" onclick="printTable('members')">列印</button>
       </div>
+      <table>
+        <thead>
+          <tr>
+            <th>會員身分證字號</th>
+            <th>會員姓名</th>
+            <th>電話</th>
+            <th>手機號碼</th>
+            <th>Email</th>
+            <th>是否加入Line</th>
+            <th>住址</th>
+            <th>年齡</th>
+            <th>照片</th>
+            <th>會員折扣</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
-      <!-- 會員資料表 -->
-      <div id="members" class="table-container hidden">
-        <h2>會員資料表</h2>
-        <div class="action-buttons">
-          <button class="operation-btn" onclick="openModal('members', 'add')">新增</button>
-          <button class="operation-btn" onclick="openModal('members', 'select')">查詢</button>
-          <button class="operation-btn" onclick="openModal('members', 'edit')">修改</button>
-          <button class="operation-btn" onclick="openModal('members', 'delete')">刪除</button>
-          <button class="print-btn" onclick="printTable('members')">列印</button>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>會員身分證字號</th>
-              <th>會員姓名</th>
-              <th>電話</th>
-              <th>手機號碼</th>
-              <th>Email</th>
-              <th>是否加入Line</th>
-              <th>住址</th>
-              <th>年齡</th>
-              <th>照片</th>
-              <th>會員折扣</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+    <!-- 靜止會員資料表 -->
+    <div id="inactive" class="table-container hidden">
+      <h2>靜止會員資料表</h2>
+      <div class="action-buttons">
+        <!-- <button class="operation-btn" onclick="openModal('inactive', 'add')">新增</button> -->
+        <button class="operation-btn" onclick="openModal('inactive', 'select')">查詢</button>
+        <button class="operation-btn" onclick="openModal('inactive', 'edit')">修改</button>
+        <button class="operation-btn" onclick="openModal('inactive', 'delete')">移轉</button>
+        <button class="print-btn" onclick="printTable('inactive')">列印</button>
       </div>
+      <table>
+        <thead>
+          <tr>
+            <th>會員身分證字號</th>
+            <th>會員姓名</th>
+            <th>電話</th>
+            <th>手機號碼</th>
+            <th>Email</th>
+            <th>是否加入Line</th>
+            <th>住址</th>
+            <th>年齡</th>
+            <th>照片</th>
+            <th>會員折扣</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
-      <!-- 靜止會員資料表 -->
-      <div id="inactive" class="table-container hidden">
-        <h2>靜止會員資料表</h2>
-        <div class="action-buttons">
-          <!-- <button class="operation-btn" onclick="openModal('inactive', 'add')">新增</button> -->
-          <button class="operation-btn" onclick="openModal('inactive', 'select')">查詢</button>
-          <button class="operation-btn" onclick="openModal('inactive', 'edit')">修改</button>
-          <button class="operation-btn" onclick="openModal('inactive', 'delete')">移轉</button>
-          <button class="print-btn" onclick="printTable('inactive')">列印</button>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>會員身分證字號</th>
-              <th>會員姓名</th>
-              <th>電話</th>
-              <th>手機號碼</th>
-              <th>Email</th>
-              <th>是否加入Line</th>
-              <th>住址</th>
-              <th>年齡</th>
-              <th>照片</th>
-              <th>會員折扣</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+    <!-- 供應商資料表 -->
+    <div id="suppliers" class="table-container hidden">
+      <h2>供應商資料表</h2>
+      <div class="action-buttons">
+        <button class="operation-btn" onclick="openModal('suppliers', 'add')">新增</button>
+        <button class="operation-btn" onclick="openModal('suppliers', 'select')">查詢</button>
+        <button class="operation-btn" onclick="openModal('suppliers', 'edit')">修改</button>
+        <button class="operation-btn" onclick="openModal('suppliers', 'delete')">刪除</button>
+        <button class="print-btn" onclick="printTable('suppliers')">列印</button>
       </div>
+      <table>
+        <thead>
+          <tr>
+            <th>供應商統一編號</th>
+            <th>水果供應商名稱</th>
+            <th>電話</th>
+            <th>Email</th>
+            <th>住址</th>
+            <th>負責人姓名</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
-      <!-- 供應商資料表 -->
-      <div id="suppliers" class="table-container hidden">
-        <h2>供應商資料表</h2>
-        <div class="action-buttons">
-          <button class="operation-btn" onclick="openModal('suppliers', 'add')">新增</button>
-          <button class="operation-btn" onclick="openModal('suppliers', 'select')">查詢</button>
-          <button class="operation-btn" onclick="openModal('suppliers', 'edit')">修改</button>
-          <button class="operation-btn" onclick="openModal('suppliers', 'delete')">刪除</button>
-          <button class="print-btn" onclick="printTable('suppliers')">列印</button>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>供應商統一編號</th>
-              <th>水果供應商名稱</th>
-              <th>電話</th>
-              <th>Email</th>
-              <th>住址</th>
-              <th>負責人姓名</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <!-- 交易資料表 -->
-      <div id="transactions" class="table-container hidden">
-        <h2>交易資料表</h2>
-        <div class="action-buttons">
+    <!-- 交易資料表 -->
+    <div id="transactions" class="table-container hidden">
+      <h2>交易資料表</h2>
+      <!-- 新增的顯示總金額區塊 -->
+      <div class="action-buttons" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
           <button class="operation-btn" onclick="openModal('transactions', 'add')">新增</button>
           <button class="operation-btn" onclick="openModal('transactions', 'select')">查詢</button>
           <button class="operation-btn" onclick="openModal('transactions', 'edit')">修改</button>
           <button class="operation-btn" onclick="openModal('transactions', 'delete')">刪除</button>
           <button class="print-btn" onclick="printTable('transactions')">列印</button>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>水果編號</th>
-              <th>會員身分證字號</th>
-              <th>水果名稱</th>
-              <th>水果供應商名稱</th>
-              <th>購買數量</th>
-              <th>出售單價</th>
-              <th>總金額</th>
-              <th>折扣後金額</th>
-              <th>交易日期</th>
-              <th>預計交運日期</th>
-              <th>實際交運日期</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <!-- 在右上角顯示總金額的區域 -->
+        <div class="transaction-total-container" style="font-weight:bold;">
+          總金額：<span id="transaction-total">0</span>
+        </div>
       </div>
+      <table>
+        <thead>
+          <tr>
+            <th>水果編號</th>
+            <th>會員身分證字號</th>
+            <th>水果名稱</th>
+            <th>水果供應商名稱</th>
+            <th>購買數量</th>
+            <th>出售單價</th>
+            <th>總金額</th>
+            <th>折扣後金額</th>
+            <th>交易日期</th>
+            <th>預計交運日期</th>
+            <th>實際交運日期</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
   </div>
 
@@ -227,21 +182,8 @@
   </div>
 
   <script src="script.js"></script>
-  <!-- 以下為新增的登入檢查函式 (新增) -->
-  <script>
-    function checkLogin() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const errorDiv = document.getElementById('login-error');
-      
-      if (username === '015' && password === '015') {
-        // 登入成功，顯示系統內容，關閉登入畫面
-        document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('system-content').style.display = 'block';
-      } else {
-        errorDiv.textContent = '帳號或密碼錯誤';
-      }
-    }
-  </script>
+  <!-- <script>
+    
+  </script> -->
 </body>
 </html>

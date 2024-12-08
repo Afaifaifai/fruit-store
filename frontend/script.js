@@ -978,23 +978,6 @@ async function transferRecord(table, data) {
 
 // 查詢資料
 async function selectRecord(table, data) {
-  // 根據表格類型和查詢條件發送 GET 請求
-  // let query = '';
-  // Object.entries(data).forEach(([key, value]) => {
-  //   if (value) { // 只有在有值的情況下才添加到查詢
-  //     query += `${encodeURIComponent(key)}=${encodeURIComponent(value)}&`;
-  //   }
-  // });
-
-  // // 如果沒有條件，阻止查詢
-  // if (query === '') {
-  //   alert('請提供至少一個查詢條件！');
-  //   return [];
-  // }
-  
-  // // 去掉最後的 &
-  // query = query.slice(0, -1);
-  
   try {
     const response = await fetch(`${API_BASE_URL}/${table}/select`, {
       method: 'POST',
@@ -1023,34 +1006,31 @@ async function selectRecord(table, data) {
       // alert('Success: ' + Data.messages.map(msg => JSON.stringify(msg)).join(', '));
 
       const messagesMapArray = [];
-
-    if (response_data.messages && Array.isArray(response_data.messages)) {
-      response_data.messages.forEach(message => {
-        const map = new Map(Object.entries(message));
-        messagesMapArray.push(map);
-            //   map.forEach((value, key) => {
-            //     console.log(`${key}:`, value);
-            // });
-      });
-      // (messagesMapArray);
-    } else {
-      console.error('Error:', Data.error || Data.messages);
-      alert(`查詢失敗: ${Data.error || Data.messages}`);
-      // alert(`新增失敗：${errorData.message}`);
+      let total_value = 0.0  
+      if (response_data.messages && Array.isArray(response_data.messages)) {
+        response_data.messages.forEach(message => {
+          const map = new Map(Object.entries(message));
+          messagesMapArray.push(map);
+              //   map.forEach((value, key) => {
+              //     console.log(`${key}:`, value);
+              // });
+          if (table === 'transactions') {
+                if (map.get('price_after_discount') != null)
+                  total_value += parseFloat(map.get('price_after_discount'));
+                else
+                  total_value += parseFloat(map.get('total_price'));
+          }
+        });
+        if (table === 'transactions') {
+          updateTransactionTotal(total_value);
+        }
+        // (messagesMapArray);
+      } else {
+        console.error('Error:', Data.error || Data.messages);
+        alert(`查詢失敗: ${Data.error || Data.messages}`);
+        // alert(`新增失敗：${errorData.message}`);
+      }
     }
-  }
-
-
-  //   if (response.ok) {
-  //     const data = await response.json();
-  //     renderTable(table, data); // BUG : forEach
-  //     alert('查詢成功！');
-  //     return data; // 返回查詢結果
-  //   } else {
-  //     const errorData = await response.json();
-  //     alert(`查詢失敗：${errorData.message}`);
-  //     return [];
-  //   }
   } catch (error) {
     console.error('查詢資料失敗:', error);
     alert('無法查詢資料，請檢查後端伺服器狀態！' + error);
@@ -1081,6 +1061,7 @@ async function fetchData(table) {
       console.log('Messages:', response_data.messages);
 
       const messagesMapArray = [];
+      let total_value = 0.0;
       if (response_data.messages && Array.isArray(response_data.messages)) {
         response_data.messages.forEach(message => {
           const map = new Map(Object.entries(message));
@@ -1088,8 +1069,17 @@ async function fetchData(table) {
               //   map.forEach((value, key) => {
               //     console.log(`${key}:`, value);
               // });
+          if (table === 'transactions') {
+            if (map.get('price_after_discount') != null)
+              total_value += parseFloat(map.get('price_after_discount'));
+            else
+              total_value += parseFloat(map.get('total_price'));
+          }
         });
         // (messagesMapArray);
+      }
+      if (table === 'transactions') {
+        updateTransactionTotal(total_value);
       }
       renderTable(table, messagesMapArray);
 
@@ -1203,46 +1193,7 @@ function renderTable(table, data) {
 
 // 列印資料（展示表格中的所有內容）
 async function printTable(table) {
-  // const tableBody = document.querySelector(`#${table} tbody`);
-  // tableBody.innerHTML = '';
-  // attrs = TABLE_ATTRIBUTE.get(table)
-  // data.forEach(row => {
-  //   const tr = document.createElement('tr');
-    
-  //   attrs.forEach(attr => {
-  //     const td = document.createElement('td');
-      
-  //     if (attr.toLowerCase() === 'photo') { // 處理圖片欄位
-  //       const img = document.createElement('img');
-  //       img.src = row.get(attr);
-  //       img.alt = 'Photo';
-  //       img.style.width = '50px'; // 根據需求調整圖片大小
-  //       img.style.height = '50px'; // 根據需求調整圖片大小
-  //       td.appendChild(img);
-  //     } else {
-  //       td.textContent = row.get(attr);
-        
-  //       // 為住址欄位添加工具提示
-  //       if ((table === 'members' || table === 'inactive') && attr.toLowerCase() === 'address') {
-  //         td.setAttribute('title', row,get(attr));
-  //       }
-  //     }
-      
-  //     tr.appendChild(td);
-  //   });
-  //   tableBody.appendChild(tr);
-  // });
-
-  // // 添加行點擊事件以選擇記錄
-  // tableBody.querySelectorAll('tr').forEach(tr => {
-  //   tr.addEventListener('click', () => {
-  //     if (selectedRow) {
-  //       selectedRow.classList.remove('selected');
-  //     }
-  //     selectedRow = tr;
-  //     selectedRow.classList.add('selected');
-  //   });
-  // });
+  updateTransactionTotal(1);
   fetchData(table);
 }
 
@@ -1290,3 +1241,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   // 若正確則不做任何事，維持原本頁面顯示。
 });
+
+// 新增一個方法用來更新總金額顯示
+function updateTransactionTotal(value) {
+  document.getElementById('transaction-total').textContent = value;
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>訂單確認</title>
+    <style>
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>訂單確認</h1>
+        <form id="orderForm">
+            <label for="menber_id">會員身分證字號：</label>
+            <input type="text" id="menber_id" placeholder="輸入身分證字號" required>
+
+            <label for="fruit_id">水果編號：</label>
+            <input type="text" id="fruit_id" placeholder="輸入水果編號" required>
+
+            <label for="order_id">訂單號碼：</label>
+            <input type="text" id="order_id" placeholder="輸入訂單號碼" required>
+
+            <button type="button" onclick="submitOrder()">送出訂單</button>
+        </form>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        async function submitOrder() {
+            const menber_id = document.getElementById("menber_id").value.trim();
+            const fruit_id = document.getElementById("fruit_id").value.trim();
+            const order_id = document.getElementById("order_id").value.trim();
+
+            if (menber_id === "" || fruit_id === "" || order_id === "") {
+                document.getElementById("result").innerHTML = "資料輸入錯誤，請填寫所有欄位。";
+                document.getElementById("result").classList.add("error");
+                document.getElementById("result").classList.remove("success");
+                return;
+            }
+
+            const idRegex = /^[A-Z][0-9]{9}$/;
+            if (!idRegex.test(menber_id)) {
+                document.getElementById("result").innerHTML = "會員身分證字號格式錯誤。";
+                document.getElementById("result").classList.add("error");
+                document.getElementById("result").classList.remove("success");
+                return;
+            }
+
+            if (isNaN(fruit_id) || isNaN(order_id)) {
+                document.getElementById("result").innerHTML = "水果編號或訂單號碼應為數字。";
+                document.getElementById("result").classList.add("error");
+                document.getElementById("result").classList.remove("success");
+                return;
+            }
+
+            // 發送資料到後端進行比對
+            const response = await fetch('/check-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ menber_id, fruit_id, order_id }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById("result").innerHTML = "訂單已確認。";
+                document.getElementById("result").classList.add("success");
+                document.getElementById("result").classList.remove("error");
+            } else {
+                document.getElementById("result").innerHTML = data.message;
+                document.getElementById("result").classList.add("error");
+                document.getElementById("result").classList.remove("success");
+            }
+        }
+    </script>
+
+</body>
+</html>
