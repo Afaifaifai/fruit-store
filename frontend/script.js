@@ -1278,3 +1278,15 @@ function getKeyAttribute(table) {
       return '';
   }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  var username = prompt("請輸入帳號");
+  var password = prompt("請輸入密碼");
+  
+  if (username !== '015' || password !== '015') {
+    alert("帳號或密碼錯誤");
+    // 若要結束程式可直接重整或導向其他頁面
+    window.location.reload();
+  }
+  // 若正確則不做任何事，維持原本頁面顯示。
+});
