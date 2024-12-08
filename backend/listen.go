@@ -118,7 +118,6 @@ func api_handler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	// log.Println(r.Method)
 	// If the Content-Type is JSON, parse and print
 	// log.Println(r.Header.Get("Content-Type"))
 	if strings.Contains(r.Header.Get("Content-Type"), "application/json") {
@@ -132,6 +131,7 @@ func api_handler(w http.ResponseWriter, r *http.Request) {
 			}
 			json.NewEncoder(w).Encode(response)
 		} else {
+			log.Println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", message)
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK) // 設置 HTTP 狀態碼為 400
 			response := Response{
@@ -151,21 +151,16 @@ func api_handler(w http.ResponseWriter, r *http.Request) {
 		}
 		json.NewEncoder(w).Encode(response)
 	}
-
-	// Respond to the client
-	// w.Header().Set("Content-Type", "application/json")
-	// // response := map[string]string{
-	// // 	"status":  "success",
-	// // 	"message": "Message received and printed",
-	// // }
-	// json.NewEncoder(w).Encode(response)
 }
 
 func process(body []byte, request_method string, api_method string, api_table string) ([]map[string]interface{}, error) {
 	fmt.Println(request_method)
-	if request_method == http.MethodGet && api_method == "all" { // Usually Get happens when api_method = all
+	if api_method == "all" { // Usually Get happens when api_method = all
+		// log.Println("GET")
 		message, err := select_all(api_table)
+
 		return message, err
+		// return select_all(api_table)
 	} else if api_method == "update" {
 		var json_data map[string]map[string]string
 		if err := json.Unmarshal(body, &json_data); err != nil {
