@@ -22,7 +22,7 @@ var fruits Table = Table{
 		purchase_date DATE NOT NULL,              															-- 進貨日期
 		promotion_start_date DATE,                															-- 開始促銷日期
 		discard_date DATE,                         															-- 該丟棄之日期
-		display TINYINT(1) NOT NULL NOT NULL DEFAULT 1
+		display TINYINT(1) NOT NULL DEFAULT 1
 	)`,
 	insert: []string{
 		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date) 
@@ -61,7 +61,7 @@ var members Table = Table{
 		age INT CHECK (age >= 0),
 		photo LONGTEXT, -- Base64
 		discount DECIMAL(3, 2) DEFAULT 1.00 CHECK (discount >= 0 AND discount <= 1) DEFAULT 0.88,
-		display TINYINT(1) NOT NULL NOT NULL DEFAULT 1
+		display TINYINT(1) NOT NULL DEFAULT 1
 	)`,
 	insert: []string{
 		`INSERT INTO members (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
@@ -99,7 +99,7 @@ var inactive Table = Table{
 		age INT CHECK (age >= 0),
 		photo LONGTEXT, -- Base64
 		discount DECIMAL(3, 2) DEFAULT 1.00 CHECK (discount >= 0 AND discount <= 1) DEFAULT 0.88,
-		display TINYINT(1) NOT NULL NOT NULL DEFAULT 1
+		display TINYINT(1) NOT NULL DEFAULT 1
 	)`,
 	insert: []string{
 		`INSERT INTO inactive (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
@@ -133,7 +133,7 @@ var suppliers Table = Table{
 		email VARCHAR(36) NOT NULL,               									-- Email
 		address VARCHAR(60),                      									-- 住址
 		contact_name VARCHAR(12) NOT NULL,         									-- 負責人姓名
-		display TINYINT(1) NOT NULL NOT NULL DEFAULT 1
+		display TINYINT(1) NOT NULL DEFAULT 1
 	)`,
 	insert: []string{
 		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
@@ -168,7 +168,7 @@ var transactions Table = Table{
 		transaction_date DATE NOT NULL,              									-- 交易日期
 		expected_shipping_date DATE NOT NULL,                							-- 預計交運日期
 		actual_shipping_date DATE,                         								-- 實際交運日期日期
-		display TINYINT(1) NOT NULL NOT NULL DEFAULT 1,
+		display TINYINT(1) NOT NULL DEFAULT 1,
 		
 		CHECK (purchase_quantity >= 0 AND purchase_quantity <= 999999),
 
@@ -182,12 +182,12 @@ var transactions Table = Table{
 			ON UPDATE CASCADE
 	)`,
 	insert: []string{
-		`INSERT INTO transactions (fruit_id, member_id, fruit_name, supplier_name, purchase_quantity, sale_price, transaction_date, expected_shipping_date, actual_shipping_date) 
-		VALUES ('12-345-678-90', 'B187654321', '火龍果', '海岸水果批發公司', 20, 20.00, '2022-11-04', '2022-11-06', '2022-11-06')`,
-		`INSERT INTO transactions (fruit_id, member_id, fruit_name, supplier_name, purchase_quantity, sale_price, transaction_date, expected_shipping_date, actual_shipping_date) 
-		VALUES ('12-345-678-91', 'B187654321', '蘋果', '山岸水果批發公司', 21, 20.00, '2022-11-04', '2022-11-06', '2022-11-06')`,
-		`INSERT INTO transactions (fruit_id, member_id, fruit_name, supplier_name, purchase_quantity, sale_price, transaction_date, expected_shipping_date, actual_shipping_date) 
-		VALUES ('12-345-678-92', 'B187654321', '橘子', '天空水果批發公司', 22, 20.00, '2022-11-04', '2022-11-06', '2022-11-06')`,
+		`INSERT INTO transactions (fruit_id, member_id, fruit_name, supplier_name, purchase_quantity, sale_price, transaction_date, expected_shipping_date, actual_shipping_date, price_after_discount) 
+		VALUES ('12-345-678-90', 'B187654321', '火龍果', '海岸水果批發公司', 20, 20.00, '2022-11-04', '2022-11-06', '2022-11-06', 352.00)`,
+		`INSERT INTO transactions (fruit_id, member_id, fruit_name, supplier_name, purchase_quantity, sale_price, transaction_date, expected_shipping_date, actual_shipping_date, price_after_discount) 
+		VALUES ('12-345-678-91', 'B187654321', '蘋果', '山岸水果批發公司', 21, 20.00, '2022-11-04', '2022-11-06', '2022-11-06', 369.60)`,
+		`INSERT INTO transactions (fruit_id, member_id, fruit_name, supplier_name, purchase_quantity, sale_price, transaction_date, expected_shipping_date, actual_shipping_date, price_after_discount) 
+		VALUES ('12-345-678-92', 'B187654321', '橘子', '天空水果批發公司', 22, 20.00, '2022-11-04', '2022-11-06', '2022-11-06', 387.20)`,
 	},
 	display_attributes: []string{
 		"fruit_id",

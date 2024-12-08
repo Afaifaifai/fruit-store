@@ -13,6 +13,8 @@ const TABLE_ATTRIBUTE = new Map([
   ["transactions", ["fruit_id", "member_id", "fruit_name", "supplier_name", "purchase_quantity", "sale_price", "total_price", "price_after_discount", "transaction_date", "expected_shipping_date", "actual_shipping_date"]]
 ]);
 
+let current_tuples = null;
+
 // 動態加載表格資料
 function loadData(table) {
   const tables = document.querySelectorAll('.table-container');
@@ -1006,28 +1008,52 @@ async function selectRecord(table, data) {
       // alert('Success: ' + Data.messages.map(msg => JSON.stringify(msg)).join(', '));
 
       const messagesMapArray = [];
-      let total_value = 0.0  
+      let total_value = 0.0, shipped = 0.0, unshipped = 0.0;  
       if (response_data.messages && Array.isArray(response_data.messages)) {
-        response_data.messages.forEach(message => {
-          const map = new Map(Object.entries(message));
-          messagesMapArray.push(map);
+        // response_data.messages.forEach(message => {
+        //   const map = new Map(Object.entries(message));
+        //   messagesMapArray.push(map);
               //   map.forEach((value, key) => {
               //     console.log(`${key}:`, value);
               // });
-          if (table === 'transactions') {
-                if (map.get('price_after_discount') != null)
-                  total_value += parseFloat(map.get('price_after_discount'));
-                else
-                  total_value += parseFloat(map.get('total_price'));
+          if (response_data.messages && Array.isArray(response_data.messages)) {
+            response_data.messages.forEach(message => {
+              const map = new Map(Object.entries(message));
+              messagesMapArray.push(map);
+                  //   map.forEach((value, key) => {
+                  //     console.log(`${key}:`, value);
+                  // });
+              if (table === 'transactions') {
+                if (map.get('price_after_discount') != null) {
+                  let price = parseFloat(map.get('price_after_discount'));
+                  total_value += price;
+                  if (map.get('actual_shipping_date') != null)
+                    shipped += price;
+                  else
+                    unshipped += price;
+                }
+                else {
+                  let price = parseFloat(map.get('total_price'));
+                  total_value += price;
+                  if (map.get('actual_shipping_date') != null)
+                    shipped += price;
+                  else
+                    unshipped += price;
+                }
+              }
+            });
           }
-        });
+          
         if (table === 'transactions') {
-          updateTransactionTotal(total_value);
+          updateTransactionTotal(total_value, shipped, unshipped);
         }
+
+        current_tuples = data;
+        renderTable(table, messagesMapArray);
         // (messagesMapArray);
       } else {
-        console.error('Error:', Data.error || Data.messages);
-        alert(`查詢失敗: ${Data.error || Data.messages}`);
+        console.error('Error:', response_data.error || response_data.messages);
+        alert(`查詢失敗: ${response_data.error || response_data.messages}`);
         // alert(`新增失敗：${errorData.message}`);
       }
     }
@@ -1036,6 +1062,30 @@ async function selectRecord(table, data) {
     alert('無法查詢資料，請檢查後端伺服器狀態！' + error);
     return [];
   }
+}
+
+async function shipped_sort() {
+  shipped = []
+  current_tuples.forEach((message) => {
+    if (message.get('actual_shipping_date') != null) {
+      shipped.push(message);
+    }
+  });
+
+  shipped.sort((a, b) => parseFloat(a.get('price_after_discount')) - parseFloat(b.get('price_after_discount')));
+  renderTable('transactions', shipped);
+}
+
+async function unshipped_sort() {
+  unshipped = []
+  current_tuples.forEach((message) => {
+    if (message.get('actual_shipping_date') == null) {
+      unshipped.push(message);
+    }
+  });
+
+  unshipped.sort((a, b) => parseFloat(a.get('price_after_discount')) - parseFloat(b.get('price_after_discount')));
+  renderTable('transactions', unshipped);
 }
 
 async function fetchData(table) {
@@ -1061,7 +1111,7 @@ async function fetchData(table) {
       console.log('Messages:', response_data.messages);
 
       const messagesMapArray = [];
-      let total_value = 0.0;
+      let total_value = 0.0, shipped = 0.0, unshipped = 0.0;
       if (response_data.messages && Array.isArray(response_data.messages)) {
         response_data.messages.forEach(message => {
           const map = new Map(Object.entries(message));
@@ -1070,17 +1120,32 @@ async function fetchData(table) {
               //     console.log(`${key}:`, value);
               // });
           if (table === 'transactions') {
-            if (map.get('price_after_discount') != null)
-              total_value += parseFloat(map.get('price_after_discount'));
-            else
-              total_value += parseFloat(map.get('total_price'));
+            if (map.get('price_after_discount') != null) {
+              let price = parseFloat(map.get('price_after_discount'));
+              total_value += price;
+              if (map.get('actual_shipping_date') != null)
+                shipped += price;
+              else
+                unshipped += price;
+            }
+            else {
+              let price = parseFloat(map.get('total_price'));
+              total_value += price;
+              if (map.get('actual_shipping_date') != null)
+                shipped += price;
+              else
+                unshipped += price;
+            }
           }
         });
         // (messagesMapArray);
       }
       if (table === 'transactions') {
-        updateTransactionTotal(total_value);
+        updateTransactionTotal(total_value.toFixed(2), shipped.toFixed(2), unshipped.toFixed(2));
       }
+
+
+      current_tuples = messagesMapArray;
       renderTable(table, messagesMapArray);
 
     }
@@ -1193,7 +1258,6 @@ function renderTable(table, data) {
 
 // 列印資料（展示表格中的所有內容）
 async function printTable(table) {
-  updateTransactionTotal(1);
   fetchData(table);
 }
 
@@ -1243,6 +1307,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 新增一個方法用來更新總金額顯示
-function updateTransactionTotal(value) {
+function updateTransactionTotal(value, shipped, unshipped) {
   document.getElementById('transaction-total').textContent = value;
+  document.getElementById('transaction-shipped').textContent = shipped;
+  document.getElementById('transaction-unshipped').textContent = unshipped;
 }
