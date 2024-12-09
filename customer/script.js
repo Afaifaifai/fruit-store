@@ -1,6 +1,6 @@
 const API_BASE_URL = 'http://localhost:8080/api'; // 後端 API 的基礎網址
 
-let DISCOUNT = 0.88;
+let DISCOUNT = 0;
 let MEMBER_ID = "B123456789";
 
 // 切換顯示登入和創建帳號介面
@@ -142,6 +142,10 @@ async function login() {
         'member_id': member_id
     }
     try {
+        // 這裡先暫存
+        localStorage.setItem('customer_username', username)
+        localStorage.setItem('customer_password', password)
+        localStorage.setItem('customer_member_id', member_id)
         const response = await fetch(`${API_BASE_URL}/customer/auth`, {
           method: 'POST',
           headers: {
@@ -155,7 +159,7 @@ async function login() {
             alert('登入成功！');
             // DISCOUNT = parseFloat(messagesMapArray[0].get('discount'));
             MEMBER_ID = member_id;
-                
+            
             window.location.href = "order_system.html";
         }
     }
@@ -175,54 +179,54 @@ async function login() {
 // }
 
 
-async function verify(member_id, username, password) {
-    data = {
-        'member_id': member_id
-    }
-    try {
-        const response = await fetch(`${API_BASE_URL}/members/select`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data)
-        });
-        const response_data = await response.json();
+// async function verify(member_id, username, password) {
+//     data = {
+//         'member_id': member_id
+//     }
+//     try {
+//         const response = await fetch(`${API_BASE_URL}/members/select`, {
+//           method: 'POST',
+//           headers: {
+//             'Content-Type': 'application/json',
+//           },
+//           body: JSON.stringify(data)
+//         });
+//         const response_data = await response.json();
 
-        if (response.ok) {
-            console.log('Success:', response_data.status);
-            console.log('Messages:', response_data.messages);
+//         if (response.ok) {
+//             console.log('Success:', response_data.status);
+//             console.log('Messages:', response_data.messages);
         
-            const messagesMapArray = [];
-            if (response_data.messages && Array.isArray(response_data.messages)) {
-                response_data.messages.forEach(message => {
-                    const map = new Map(Object.entries(message));
-                    messagesMapArray.push(map);
-                });
-            }
-            console.log(messagesMapArray[0].get('username'));
-            console.log(messagesMapArray[0].get('password'));
-            if (messagesMapArray[0].get('username') === username && messagesMapArray[0].get('password') === password) {
-                alert('登入成功！');
-                DISCOUNT = parseFloat(messagesMapArray[0].get('discount'));
-                MEMBER_ID = member_id;
+//             const messagesMapArray = [];
+//             if (response_data.messages && Array.isArray(response_data.messages)) {
+//                 response_data.messages.forEach(message => {
+//                     const map = new Map(Object.entries(message));
+//                     messagesMapArray.push(map);
+//                 });
+//             }
+//             console.log(messagesMapArray[0].get('username'));
+//             console.log(messagesMapArray[0].get('password'));
+//             if (messagesMapArray[0].get('username') === username && messagesMapArray[0].get('password') === password) {
+//                 alert('登入成功！');
+//                 DISCOUNT = parseFloat(messagesMapArray[0].get('discount'));
+//                 MEMBER_ID = member_id;
                 
-                window.location.href = "order_system.html";
-            }
-            else {
-                alert('帳號或密碼錯誤');
-            }
+//                 window.location.href = "order_system.html";
+//             }
+//             else {
+//                 alert('帳號或密碼錯誤');
+//             }
 
-        } else {
-            console.error('Error:', response_data.error);
-            alert(`查無此用戶: ${response_data.error}`);
-        }
-    }
-    catch (error) {
-        console.error('查詢資料失敗:', error);
-        alert('查無此用戶！');
-    }
-}
+//         } else {
+//             console.error('Error:', response_data.error);
+//             alert(`查無此用戶: ${response_data.error}`);
+//         }
+//     }
+//     catch (error) {
+//         console.error('查詢資料失敗:', error);
+//         alert('查無此用戶！');
+//     }
+// }
 
 
 
