@@ -78,75 +78,125 @@ const API_BASE_URL = 'http://localhost:8080/api'; // 後端 API 的基礎網址
 
 
 
-// Private
-async function submitOrder() {
-    const menber_id = document.getElementById("menber_id").value.trim();
-    const fruit_id = document.getElementById("fruit_id").value.trim();
-    const transaction_id = document.getElementById("order_id").value.trim();
-
-    // const resultDiv = document.getElementById("result");
-
-    // if (menber_id === "" || fruit_id === "" || order_id === "") {
-    //     resultDiv.innerHTML = "資料輸入錯誤，請填寫所有欄位。";
-    //     resultDiv.classList.add("error");
-    //     resultDiv.classList.remove("success");
-    //     return;
-    // }
-
-    // const idRegex = /^[A-Z][0-9]{9}$/;
-    // if (!idRegex.test(menber_id)) {
-    //     resultDiv.innerHTML = "會員身分證字號格式錯誤。";
-    //     resultDiv.classList.add("error");
-    //     resultDiv.classList.remove("success");
-    //     return;
-    // }
-
-    // if (isNaN(fruit_id) || isNaN(order_id)) {
-    //     resultDiv.innerHTML = "水果編號或訂單號碼應為數字。";
-    //     resultDiv.classList.add("error");
-    //     resultDiv.classList.remove("success");
-    //     return;
-    // }
-
-    conditions = {
-        "transaction_id": transaction_id,
-        "menber_id": menber_id,
-        "fruit_id": fruit_id
-    }
-    updates = {
-        "actual_shipping_date": getTodayDate()
+        // 定義獲取今天日期的函數
+    // 定義獲取今天日期的函數
+    function getTodayDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
-    // 發送資料到後端進行比對
-    try {
-        const response = await fetch(`${API_BASE_URL}/transactions/update`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ conditions, updates }),
-        });
+    // 提交訂單函數
+    async function submitOrder() {
+        console.log("submitOrder called");
 
-        if (response.ok) {
-            console.log('Success:', response_data.status);
-            console.log('Messages:', response_data.messages);
-            let new_orders = {};
-            console.log('訂單已確認');
-            orders = new_orders;
-        } else {
-            console.log('更新訂單失敗:', response_data.error);
-            alert(`更新訂單失敗: ${response_data.error}`);
+        const member_id = document.getElementById("member_id").value.trim();
+        const fruit_id = document.getElementById("fruit_id").value.trim();
+        const transaction_id = document.getElementById("order_id").value.trim();
+
+        console.log("member_id:", member_id);
+        console.log("fruit_id:", fruit_id);
+        console.log("transaction_id:", transaction_id);
+
+        const conditions = {
+            "transaction_id": transaction_id,
+            "member_id": member_id,
+            "fruit_id": fruit_id
+        };
+        const updates = {
+            "actual_shipping_date": getTodayDate()
+        };
+
+        console.log("conditions:", conditions);
+        console.log("updates:", updates);
+
+        // 發送資料到後端進行比對
+        try {
+            const response = await fetch(`${API_BASE_URL}/transactions/update`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ conditions, updates }),
+            });
+
+            console.log("Response status:", response.status);
+            const response_data = await response.json();
+            console.log("Response data:", response_data);
+
+            const resultDiv = document.getElementById('result');
+
+            if (response.ok) {
+                console.log('訂單已確認');
+                // 清空輸入欄位
+                document.getElementById("member_id").value = '';
+                document.getElementById("fruit_id").value = '';
+                document.getElementById("order_id").value = '';
+
+                // 顯示成功訊息
+                resultDiv.className = 'result success';
+                resultDiv.textContent = '訂單已成功確認！';
+                resultDiv.style.display = 'block';
+            } else {
+                console.log('更新訂單失敗:', response_data.error);
+                // 顯示錯誤訊息
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `更新訂單失敗: ${response_data.error}`;
+                resultDiv.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('更新訂單失敗:', error);
+            const resultDiv = document.getElementById('result');
+            // 顯示錯誤訊息
+            resultDiv.className = 'result error';
+            resultDiv.textContent = `更新訂單失敗: ${error}`;
+            resultDiv.style.display = 'block';
         }
-    } catch (error) {
-        console.error('更新訂單失敗:', error);
-        alert(`更新訂單失敗: ${response_data.error}`);
     }
-}
+// Private
+// async function submitOrder() {
+//     const menber_id = document.getElementById("menber_id").value.trim();
+//     const fruit_id = document.getElementById("fruit_id").value.trim();
+//     const transaction_id = document.getElementById("order_id").value.trim();
 
-function getTodayDate() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // 月份從 0 開始
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
+//     conditions = {
+//         "transaction_id": transaction_id,
+//         "member_id": menber_id,
+//         "fruit_id": fruit_id
+//     }
+//     updates = {
+//         "actual_shipping_date": getTodayDate()
+//     }
+
+//     // 發送資料到後端進行比對
+//     try {
+//         const response = await fetch(`${API_BASE_URL}/transactions/update`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({ conditions, updates }),
+//         });
+
+//         const response_data = await response.json();
+//         if (response.ok) {
+//             console.log('訂單已確認');
+//         } else {
+//             console.log('更新訂單失敗:', response_data.error);
+//             alert(`更新訂單失敗: ${response_data.error}`);
+//         }
+//     } catch (error) {
+//         console.error('更新訂單失敗:', error);
+//         alert(`更新訂單失敗: ${error}`);
+//     }
+// }
+
+// function getTodayDate() {
+//     const today = new Date();
+//     const year = today.getFullYear();
+//     const month = String(today.getMonth() + 1).padStart(2, '0'); // 月份從 0 開始
+//     const day = String(today.getDate()).padStart(2, '0');
+//     return `${year}-${month}-${day}`;
+// }
