@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8080/api'; // 後端 API 的基礎網址
+const API_BASE_URL = 'http://140.128.101.122:31167/api'; // 後端 API 的基礎網址
 
 // 全局變數
 let selectedRow = null;
@@ -1314,3 +1314,4 @@ function updateTransactionTotal(value, shipped, unshipped) {
   document.getElementById('transaction-shipped').textContent = shipped;
   document.getElementById('transaction-unshipped').textContent = unshipped;
 }
+
