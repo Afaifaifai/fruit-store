@@ -419,6 +419,11 @@ async function purchaseFruit() {
                 console.log('Success:', response_data.status);
                 console.log('Messages:', response_data.messages);
                 alert('更新水果數量成功');
+
+                document.getElementById('fruit-select').value = '';
+                document.getElementById('purchase-quantity').value = '';
+                document.getElementById('delivery-date').value = '';
+                document.getElementById('purchase-price').value = '';
                 
             } else {
                 console.log('更新水果數量失敗:', response_data.error);
@@ -464,10 +469,10 @@ function updateOrderStatus() {
         <p>
             訂單編號 ${transaction_id}: ${transaction_info.get('fruit_id')} ${transaction_info.get('fruit_name')} - ${transaction_info.get('purchase_quantity')} 顆 - ${transaction_info.get('price_after_discount')} 元
             (供應商: ${transaction_info.get('supplier_name')}, 交運日期: ${transaction_info.get('transaction_date')})
-            <span class="delete-button" onclick="deleteOrder(${transaction_id})">刪除</span>
         </p>
     `
     ).join('');
+    // <span class="delete-button" onclick="deleteOrder(${transaction_id})">刪除</span>
     console.log(orderListDiv.innerHTML);
 
     // 更新總金額
