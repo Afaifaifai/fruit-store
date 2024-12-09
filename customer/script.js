@@ -153,7 +153,7 @@ async function login() {
           },
           body: JSON.stringify(data)
         });
-        const response_data = await response.json();
+        // const response_data = await response.json();
 
         if (response.ok) {
             alert('登入成功！');
@@ -444,7 +444,7 @@ async function purchaseFruit() {
     // totalAmount += total;
 
     // 顯示結果
-    const resultDiv = document.getElementById('result');
+    // const resultDiv = document.getElementById('result');
     // resultDiv.innerHTML = `<p>已成功下單：${fruit.name} - ${quantity} 顆，總金額：${total} 元，交運日期：${deliveryDate}，供應商:${fruit.supplier}</p>`;
 
     // 更新訂單狀況

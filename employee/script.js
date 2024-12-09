@@ -26,41 +26,55 @@ const API_BASE_URL = 'http://localhost:8080/api'; // 後端 API 的基礎網址
 //     }
 // });
 
-async function login() {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
+        // 定義你的 API 基礎 URL
 
-    data = {
-        'username': username,
-        'password': password,
-    }
-    try {
-        localStorage.setItem('customer_username', username)
-        localStorage.setItem('customer_password', password)
-        // alert(0)
-        const response = await fetch(`${API_BASE_URL}/employee/auth`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-          });
-        // alert(1)
-        const response_data = await response.json();
-        // alert(2)
-        if (response.ok) {
-            alert('登入成功！');
-            window.location.href = "employee_private.html";
-        } else {
-            alert('登入失敗！', response_data.error);
-        } 
-        
-    }
-    catch (error) {
-        console.error('查詢資料失敗:', error);
-        alert('查詢資料失敗:' + error);
-    }
-}
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // 阻止表單預設提交行為
+            await login();
+        });
+
+        async function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            const data = {
+                'username': username,
+                'password': password,
+            };
+
+            const errorMessage = document.getElementById('errorMessage');
+            const loading = document.getElementById('loading');
+            errorMessage.textContent = '';
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/employee/auth`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const response_data = await response.json();
+                loading.style.display = 'none';
+
+                if (response.ok) {
+                    // 假設後端返回一個 token
+                    localStorage.setItem('authToken', response_data.token);
+                    alert('登入成功！');
+                    window.location.href = "employee_private.html";
+                } else {
+                    // 使用頁面上的錯誤訊息顯示
+                    errorMessage.textContent = response_data.error || '登入失敗！';
+                }
+            }
+            catch (error) {
+                loading.style.display = 'none';
+                console.error('查詢資料失敗:', error);
+                errorMessage.textContent = '查詢資料失敗，請稍後再試。';
+            }
+        }
 
 
 
