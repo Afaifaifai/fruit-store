@@ -156,10 +156,12 @@ async function login() {
         // const response_data = await response.json();
 
         if (response.ok) {
+            const response_data = await response.json();
+
+            // 保存 Token 到 localStorage
+            localStorage.setItem('authToken', response_data.token);
+
             alert('登入成功！');
-            // DISCOUNT = parseFloat(messagesMapArray[0].get('discount'));
-            // MEMBER_ID = member_id;
-            
             window.location.href = "customer_private.html";
         }
     }
