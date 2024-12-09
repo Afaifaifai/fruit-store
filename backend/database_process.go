@@ -322,8 +322,10 @@ func delete_table(table string, data map[string]string) ([]map[string]interface{
 func authenticator(target string, data map[string]string) ([]map[string]interface{}, error) {
 	if target == "employee" {
 		if data["username"] == "015" && data["password"] == "015" {
+			// log.Println("login successfully")
 			return nil, nil
 		} else {
+			// log.Println("error: username or password is incorrect")
 			return nil, fmt.Errorf("error: username or password is incorrect")
 		}
 	} else if target == "customer" {

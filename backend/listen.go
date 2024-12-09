@@ -145,7 +145,7 @@ func api_handler(w http.ResponseWriter, r *http.Request) {
 		// log.Printf("Received non-JSON request resource: %s %s, Content:\n%s\n", api_table, api_method, string(body))
 		log.Printf("Received non-JSON request resource: %s %s\n", api_table, api_method)
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest) // 設置 HTTP 狀態碼為 400
+		w.WriteHeader(http.StatusUnauthorized) // 設置 HTTP 狀態碼為 400
 		response := Response{
 			Status: "error",
 			Error:  "Invalid content type",
