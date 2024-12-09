@@ -35,7 +35,7 @@ func select_all(table string) ([]map[string]interface{}, error) {
 	log.Println(cmd)
 	rows, err := DB.Query(cmd)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return nil, err
 	}
 	var message []map[string]interface{}
@@ -62,9 +62,9 @@ func select_all(table string) ([]map[string]interface{}, error) {
 				v = values[i] // 保持原始類型
 			}
 			row_map[attr] = v
-			fmt.Print(attr, ": ", v, " ")
+			// fmt.Print(attr, ": ", v, " ")
 		}
-		fmt.Println()
+		// fmt.Println()
 		message = append(message, row_map)
 	}
 
@@ -109,7 +109,7 @@ func insert_table(table string, data map[string]string) ([]map[string]interface{
 		}
 		member_id := data["member_id"]
 		var discount_select_cmd string = "SELECT discount FROM members WHERE member_id='" + member_id + "'"
-		fmt.Println(discount_select_cmd)
+		log.Println(discount_select_cmd)
 		rows, err := DB.Query(discount_select_cmd)
 		if err != nil {
 			log.Println("error: ", err)
@@ -148,7 +148,7 @@ func insert_table(table string, data map[string]string) ([]map[string]interface{
 			}
 		}
 		cmd := fmt.Sprintf("INSERT INTO %s (price_after_discount %s) VALUES (%.2f %s)", table, attrs, price_after_discount, values)
-		fmt.Println(cmd)
+		log.Println(cmd)
 		_, err = DB.Exec(cmd)
 		if err != nil {
 			log.Println("error: ", err)
@@ -167,7 +167,7 @@ func insert_table(table string, data map[string]string) ([]map[string]interface{
 			}
 		}
 		cmd := fmt.Sprintf("INSERT INTO %s (display %s) VALUES (1 %s)", table, attrs, values)
-		fmt.Println(cmd)
+		log.Println(cmd)
 		_, err := DB.Exec(cmd)
 		if err != nil {
 			log.Println("error: ", err)
@@ -215,7 +215,7 @@ func select_table(table string, data map[string]string) ([]map[string]interface{
 	log.Println(cmd)
 	rows, err := DB.Query(cmd)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return nil, err
 	}
 	var message []map[string]interface{}
@@ -242,9 +242,9 @@ func select_table(table string, data map[string]string) ([]map[string]interface{
 				v = values[i] // 保持原始類型
 			}
 			row_map[attr] = v
-			fmt.Print(attr, ": ", v, " ")
+			// fmt.Print(attr, ": ", v, " ")
 		}
-		fmt.Println()
+		// fmt.Println()
 		message = append(message, row_map)
 	}
 	return message, nil
@@ -281,7 +281,7 @@ func delete_table(table string, data map[string]string) ([]map[string]interface{
 		}
 		var INSERT_INTO, SELECT, FROM, WHERE string = fmt.Sprintf("INSERT INTO %s (%s) ", insert_table.name, attrs), "SELECT " + attrs, " FROM " + select_table.name, " WHERE display = 1" + condition
 		cmd := INSERT_INTO + SELECT + FROM + WHERE
-		fmt.Println(cmd)
+		log.Println(cmd)
 		_, err := DB.Exec(cmd)
 		if err != nil {
 			log.Println(err)
@@ -308,7 +308,7 @@ func delete_table(table string, data map[string]string) ([]map[string]interface{
 		}
 		var UPDATE, SET, WHERE string = "UPDATE " + table, " SET display = 0 ", "WHERE display = 1" + condition
 		cmd := UPDATE + SET + WHERE
-		fmt.Println(cmd)
+		log.Println(cmd)
 		_, err := DB.Exec(cmd)
 		if err != nil {
 			log.Println(err)

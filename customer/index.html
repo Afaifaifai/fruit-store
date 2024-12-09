@@ -33,9 +33,9 @@
     <!-- 登入介面 -->
     <div id="login-container" class="container active">
         <h2>登入</h2>
-        <input type="text" id="login-username" placeholder="帳號"><br>
-        <input type="password" id="login-password" placeholder="密碼"><br>
-        <input type="text" id="login-id" placeholder="會員身份證字號"><br>
+        <input type="text" id="login-username" placeholder="帳號" required><br>
+        <input type="password" id="login-password" placeholder="密碼" required><br>
+        <input type="text" id="login-id" placeholder="會員身份證字號" required><br>
         <button onclick="login()">登入</button>
         <p>沒有帳號？<a href="#" onclick="showCreateAccount()">創建帳號</a></p>
     </div>
@@ -43,19 +43,19 @@
     <!-- 創建帳號介面 -->
     <div id="create-account-container" class="container">
         <h2>創建帳號</h2>
-        <input type="text" id="create-username" placeholder="輸入帳號(必填)"><br>
-        <input type="password" id="create-password" placeholder="輸入密碼(必填)"><br>
-        <input type="text" id="create-id" placeholder="會員身份證字號(必填)" required><br>
-        <input type="text" id="create-name" placeholder="會員姓名(必填)"><br>
-        <input type="text" id="create-phone" placeholder="電話(選填)"><br>
-        <input type="text" id="create-mobile" placeholder="手機號碼(選填)"><br>
-        <input type="email" id="create-email" placeholder="Email(必填)"><br>
-        <input type="text" id="create-address" placeholder="住址(選填)"><br>
-        <input type="number" id="create-age" placeholder="年齡(選填)" min="0"><br>
+        <input type="text" id="create-username" placeholder="輸入帳號(必填)"  required><br>
+        <input type="password" id="create-password" placeholder="輸入密碼(必填)" required><br>
+        <input type="text" id="create-id" placeholder="會員身份證字號(必填)" pattern="[A-Z]{1}\\d{9}" required><br>
+        <input type="text" id="create-name" placeholder="會員姓名(必填)" maxlength="12" required><br>
+        <input type="text" id="create-phone" placeholder="電話(選填)" pattern="\\d{2}\\d{4}\\d{4}"><br>
+        <input type="text" id="create-mobile" placeholder="手機號碼(選填)" pattern="\\d{4}\\d{3}\\d{3}"><br>
+        <input type="email" id="create-email" placeholder="Email(必填)" required><br>
+        <input type="text" id="create-address" placeholder="住址(選填)" maxlength="60"><br>
+        <input type="number" id="create-age" placeholder="年齡(選填)" min="0" max="9999"><br>
         <div>
             <p>是否加入 Line(選填)：</p>
-            <label><input type="radio" name="line-opt-in" value="yes"> 是</label>
-            <label><input type="radio" name="line-opt-in" value="no"> 否</label>
+            <label><input type="radio" name="line-opt-in" value="是"> 是</label>
+            <label><input type="radio" name="line-opt-in" value="不是"> 否</label>
         </div>
         <div>
             <p>上傳照片(選填)：</p>

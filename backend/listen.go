@@ -131,7 +131,7 @@ func api_handler(w http.ResponseWriter, r *http.Request) {
 			}
 			json.NewEncoder(w).Encode(response)
 		} else {
-			log.Println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", message)
+			// log.Println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", message)
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK) // 設置 HTTP 狀態碼為 400
 			response := Response{
@@ -142,7 +142,8 @@ func api_handler(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		// Otherwise, print as plain text
-		log.Printf("Received non-JSON request resource: %s %s, Content:\n%s\n", api_table, api_method, string(body))
+		// log.Printf("Received non-JSON request resource: %s %s, Content:\n%s\n", api_table, api_method, string(body))
+		log.Printf("Received non-JSON request resource: %s %s\n", api_table, api_method)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest) // 設置 HTTP 狀態碼為 400
 		response := Response{
@@ -167,8 +168,10 @@ func process(body []byte, request_method string, api_method string, api_table st
 			log.Printf("Received invalid JSON request: %s", err)
 			return nil, err
 		} else {
-			prettyJSON, _ := json.MarshalIndent(json_data, "", "  ")
-			log.Printf("Received JSON request resource: %s %s %s, Content:\n%s\n", request_method, api_table, api_method, string(prettyJSON))
+			json.MarshalIndent(json_data, "", "  ")
+			// prettyJSON, _ := json.MarshalIndent(json_data, "", "  ")
+			// log.Printf("Received JSON request resource: %s %s %s, Content:\n%s\n", request_method, api_table, api_method, string(prettyJSON));
+			log.Printf("Received JSON request resource: %s %s %s\n", request_method, api_table, api_method)
 			var conditions, updates map[string]string
 			var conditions_exists, updates_exists bool
 			conditions, conditions_exists = json_data["conditions"]
@@ -176,7 +179,9 @@ func process(body []byte, request_method string, api_method string, api_table st
 
 			if conditions_exists {
 				for key, value := range conditions {
-					log.Printf("Condition - %s: %s", key, value)
+					if key != "photo" {
+						log.Printf("Condition - %s: %s", key, value)
+					}
 				}
 			} else {
 				log.Printf("Conditions not found")
@@ -184,7 +189,9 @@ func process(body []byte, request_method string, api_method string, api_table st
 
 			if updates_exists {
 				for key, value := range updates {
-					log.Printf("Update - %s: %s", key, value)
+					if key != "photo" {
+						log.Printf("Update - %s: %s", key, value)
+					}
 				}
 			} else {
 				log.Printf("Updates not found")
@@ -199,10 +206,14 @@ func process(body []byte, request_method string, api_method string, api_table st
 			log.Printf("Received invalid JSON request: %s", err)
 			return nil, err
 		} else {
-			prettyJSON, _ := json.MarshalIndent(json_data, "", "  ")
-			log.Printf("Received JSON request resource: %s %s %s, Content:\n%s\n", request_method, api_table, api_method, string(prettyJSON))
+			// prettyJSON, _ := json.MarshalIndent(json_data, "", "  ")
+			json.MarshalIndent(json_data, "", "  ")
+			// log.Printf("Received JSON request resource: %s %s %s, Content:\n%s\n", request_method, api_table, api_method, string(prettyJSON))
+			log.Printf("Received JSON request resource: %s %s %s\n", request_method, api_table, api_method)
 			for key, value := range json_data {
-				log.Printf("Data - %s: %s", key, value)
+				if key != "photo" {
+					log.Printf("Data - %s: %s", key, value)
+				}
 			}
 
 			var message []map[string]interface{}
