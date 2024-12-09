@@ -130,12 +130,39 @@ async function create_user(data) {
 }
 
 // 登入功能
-function login() {
+async function login() {
     const username = document.getElementById('login-username').value.trim();
     const password = document.getElementById('login-password').value.trim();
     const member_id = document.getElementById('login-id').value.trim();
 
-    verify(member_id, username, password);
+    // verify(member_id, username, password);
+    data = {
+        'username': username,
+        'password': password,
+        'member_id': member_id
+    }
+    try {
+        const response = await fetch(`${API_BASE_URL}/customer/auth`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+        const response_data = await response.json();
+
+        if (response.ok) {
+            alert('登入成功！');
+            // DISCOUNT = parseFloat(messagesMapArray[0].get('discount'));
+            MEMBER_ID = member_id;
+                
+            window.location.href = "order_system.html";
+        }
+    }
+    catch (error) {
+        console.error('查詢資料失敗:', error);
+        alert('查無此用戶！');
+    }
 }
 
 // 檢查帳號密碼與身份證字號

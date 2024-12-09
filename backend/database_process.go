@@ -318,3 +318,35 @@ func delete_table(table string, data map[string]string) ([]map[string]interface{
 	}
 	return nil, nil
 }
+
+func authenticator(target string, data map[string]string) ([]map[string]interface{}, error) {
+	if target == "employee" {
+		if data["username"] == "015" && data["password"] == "015" {
+			return nil, nil
+		} else {
+			return nil, fmt.Errorf("error: username or password is incorrect")
+		}
+	} else if target == "customer" {
+		cmd := fmt.Sprintf("SELECT username, password FROM members WHERE member_id='%s'", data["member_id"])
+		rows, err := DB.Query(cmd)
+		if err != nil {
+			log.Println("error: ", err)
+			return nil, err
+		}
+
+		var username, password string
+		for rows.Next() {
+			if err := rows.Scan(&username, &password); err != nil {
+				log.Println("error: ", err)
+				return nil, err
+			} else {
+				if username == data["username"] && password == data["password"] {
+					return nil, nil
+				} else {
+					return nil, fmt.Errorf("error: username or password is incorrect")
+				}
+			}
+		}
+	}
+	return nil, fmt.Errorf("error: target is not correct")
+}

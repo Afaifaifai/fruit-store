@@ -124,7 +124,7 @@ func api_handler(w http.ResponseWriter, r *http.Request) {
 		message, err := process(body, r.Method, api_method, api_table)
 		if err != nil {
 			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest) // 設置 HTTP 狀態碼為 400
+			w.WriteHeader(http.StatusUnauthorized) // 設置 HTTP 狀態碼為 401
 			response := Response{
 				Status: "error",
 				Error:  err.Error(),
@@ -133,7 +133,7 @@ func api_handler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			// log.Println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", message)
 			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK) // 設置 HTTP 狀態碼為 400
+			w.WriteHeader(http.StatusOK) // 設置 HTTP 狀態碼為 200
 			response := Response{
 				Status:   "success",
 				Messages: message,
@@ -199,6 +199,19 @@ func process(body []byte, request_method string, api_method string, api_table st
 
 			_, err := update_table(api_table, conditions, updates)
 			return nil, err
+		}
+	} else if api_method == "auth" {
+		var json_data map[string]string
+		if err := json.Unmarshal(body, &json_data); err != nil && request_method != http.MethodGet {
+			log.Printf("Received invalid JSON request: %s", err)
+			return nil, err
+		} else {
+			json.MarshalIndent(json_data, "", "  ")
+			log.Printf("Received JSON request resource: %s %s %s\n", request_method, api_table, api_method)
+			for key, value := range json_data {
+				log.Printf("Data - %s: %s", key, value)
+			}
+			return authenticator(api_table, json_data)
 		}
 	} else {
 		var json_data map[string]string
