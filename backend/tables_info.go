@@ -26,11 +26,25 @@ var fruits Table = Table{
 	)`,
 	insert: []string{
 		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date) 
-		VALUES ('12-345-678-90', '火龍果', '銘傳水果公司', 30, '粒', 10.00, '一樓冷藏倉庫', '2022-11-04', '2022-11-08', '2022-11-12')`,
+		VALUES ('12-345-678-90', '火龍果', '火龍果水果公司', 100, '顆', 30.00, '一樓冷藏倉庫', '2022-11-04', '2022-11-08', '2028-11-12')`,
 		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date)
-		VALUES ('12-345-678-91', '蘋果', '銘傳水果公司司', 30, '粒', 10.00, '一樓冷藏倉庫', '2022-11-04', '2022-11-08', '2022-11-12')`,
+		VALUES ('12-345-678-91', '蘋果', '蘋果水果公司', 200, '顆', 50.00, '二樓冷藏倉庫', '2022-11-04', '2022-11-08', '2029-11-12')`,
 		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date)
-		VALUES ('12-345-678-92', '橘子', '銘傳水果公司司', 30, '粒', 10.00, '一樓冷藏倉庫', '2022-11-04', '2022-11-08', '2022-11-12')`,
+		VALUES ('12-345-678-92', '橘子', '橘子水果公司', 150, '顆', 55.00, '一樓冷藏倉庫', '2022-11-04', '2022-11-08', '2077-11-12')`,
+		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date)
+		VALUES ('12-345-678-93', '香蕉', '香蕉水果公司', 500, '支', 100.00, '三樓冷藏倉庫', '2022-11-04', '2022-11-08', '2058-11-12')`,
+		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date)
+		VALUES ('12-345-678-94', '蓮霧', '蓮霧水果公司', 110, '顆', 90.00, 'PS5旁邊', '2022-11-04', '2022-11-08', '2057-11-12')`,
+		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date)
+		VALUES ('12-345-678-95', '楊桃', '楊桃水果公司', 90, '顆', 80.00, 'Switch旁邊', '2022-11-04', '2022-11-08', '3025-11-12')`,
+		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date)
+		VALUES ('12-345-678-96', '芭樂', '芭樂水果公司', 800, '顆', 70.00, 'Switch旁邊', '2022-11-04', '2022-11-08', '2578-11-12')`,
+		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date)
+		VALUES ('12-345-678-97', '鳳梨', '鳳梨水果公司', 70, '顆', 150.00, '十樓冷藏倉庫', '2022-11-04', '2022-11-08', '2678-11-12')`,
+		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date)
+		VALUES ('12-345-678-98', '番茄', '番茄水果公司', 800, '顆', 10.00, '九樓冷藏倉庫', '2022-11-04', '2022-11-08', '2778-11-12')`,
+		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date)
+		VALUES ('12-345-678-99', '棗子', '棗子水果公司', 5000, '顆', 30.00, '九樓冷藏倉庫', '2022-11-04', '2022-11-08', '2878-11-12')`,
 	},
 	display_attributes: []string{
 		"fruit_id",
@@ -145,11 +159,25 @@ var suppliers Table = Table{
 	)`,
 	insert: []string{
 		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
-		VALUES ('12345678', '海岸水果批發公司', 0423590121, 'yyyy@coast.com', '台中市仰德大道ZZ號', '王海東')`,
+		VALUES ('12345678', '火龍果水果批發公司', 0423590121, 'yyyy@coast.com', '台中市仰德大道ZZ號', '王海東')`,
 		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
-		VALUES ('12345679', '山岸水果批發公司', 0423590122, 'ayyy@coast.com', '台中市仰德大道ZQ號', '王海西')`,
+		VALUES ('12345679', '蘋果水果批發公司', 0423590122, 'ayyy@coast.com', '台中市仰德大道ZQ號', '王海西')`,
 		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
-		VALUES ('12345670', '天空水果批發公司', 0423590123, 'byyy@coast.com', '台中市仰德大道ZA號', '王海南')`,
+		VALUES ('12345670', '橘子水果批發公司', 0423590123, 'byyy@coast.com', '台中市仰德大道ZA號', '王海南')`,
+		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
+		VALUES ('12345671', '香蕉水果批發公司', 0423590124, 'byyy@coast.com', '台中市仰德大道ZA號', '王海東')`,
+		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
+		VALUES ('12345672', '蓮霧水果批發公司', 0423590125, 'byyy@coast.com', '台中市仰德大道ZA號', '王海北')`,
+		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
+		VALUES ('12345673', '楊桃水果批發公司', 0423590126, 'byyy@coast.com', '台中市仰德大道ZA號', '王海南')`,
+		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
+		VALUES ('12345674', '芭樂水果批發公司', 0423590126, 'byyy@coast.com', '台中市仰德大道ZA號', '王海東')`,
+		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
+		VALUES ('12345675', '鳳梨水果批發公司', 0423590126, 'byyy@coast.com', '台中市仰德大道ZA號', '王海西')`,
+		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
+		VALUES ('12345676', '番茄水果批發公司', 0423590126, 'byyy@coast.com', '台中市仰德大道ZA號', '王海北')`,
+		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
+		VALUES ('12345677', '棗子水果批發公司', 0423590126, 'byyy@coast.com', '台中市仰德大道ZA號', '王海南')`,
 	},
 	display_attributes: []string{
 		"supplier_id",

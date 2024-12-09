@@ -1,7 +1,7 @@
 const API_BASE_URL = 'http://localhost:8080/api'; // 後端 API 的基礎網址
 
-let DISCOUNT = 0;
-let MEMBER_ID = "B123456789";
+// let DISCOUNT = 0;
+// let MEMBER_ID = "B123456789";
 
 // 切換顯示登入和創建帳號介面
 function showLogin() {
@@ -158,9 +158,9 @@ async function login() {
         if (response.ok) {
             alert('登入成功！');
             // DISCOUNT = parseFloat(messagesMapArray[0].get('discount'));
-            MEMBER_ID = member_id;
+            // MEMBER_ID = member_id;
             
-            window.location.href = "order_system.html";
+            window.location.href = "private.html";
         }
     }
     catch (error) {
@@ -285,7 +285,7 @@ async function updateFruitSelect() {
 
     const select = document.getElementById('fruit-select');
     select.innerHTML = '<option value="">選擇水果</option>';
-    Object.entries(fruitDatabase).forEach(([fruit_id, fruit_tuple] )=> {
+    Object.entries(fruitDatabase).forEach(([fruit_id, fruit_tuple])=> {
         const salePrice = (parseFloat(fruit_tuple.get('purchase_price')) * 1.5).toFixed(2);
         select.innerHTML += `<option value=${fruit_id}>編號: ${fruit_tuple.get('fruit_id')} - 名稱: ${fruit_tuple.get('fruit_name')} - 標準售價: $${salePrice} (庫存: ${fruit_tuple.get('quantity')})</option>`;
         console.log(`<option value=${fruit_id}>編號: ${fruit_tuple.get('fruit_id')} - 名稱: ${fruit_tuple.get('fruit_name')}> - 標準售價: $${salePrice} (庫存: ${fruit_tuple.get('quantity')})</option>`);
@@ -317,9 +317,10 @@ async function purchaseFruit() {
         return;
     }
 
+    member_id = localStorage.getItem('customer_member_id');
     data = {
         "fruit_id": fruit_id,
-        "member_id": MEMBER_ID,
+        "member_id": member_id,
         "fruit_name": fruit_tuple.get('fruit_name'),
         "supplier_name": fruit_tuple.get('supplier_name'),
         "purchase_quantity": String(quantity), // int
@@ -331,7 +332,7 @@ async function purchaseFruit() {
     let transaction_success = false;
     // Insert into transactions table
     try {
-        console.log("Member id", MEMBER_ID);
+        // console.log("Member id", MEMBER_ID);
         const response = await fetch(`${API_BASE_URL}/transactions/insert`, {
             method: 'PUT',
             headers: {
@@ -359,8 +360,8 @@ async function purchaseFruit() {
 
     // Select transactions by member_id, sipped = 0 (Reload)
     select_conditions = {
-        "member_id": MEMBER_ID,
-        "shipped": "0"
+        "member_id": localStorage.getItem('customer_member_id'),
+        "shipped": "0" // 限制未取貨 
     }
     try {
         const response = await fetch(`${API_BASE_URL}/transactions/select`, {
@@ -431,16 +432,16 @@ async function purchaseFruit() {
     }
 
     // 計算金額
-    const total_price = (sale_price * quantity).toFixed(2);
-    const price_after_discount = (total_price * DISCOUNT).toFixed(2);
-    console.log(`Total price: ${total_price}`);
-    console.log(`Price after discount: ${price_after_discount}`);
+    // const total_price = (sale_price * quantity).toFixed(2);
+    // const price_after_discount = (total_price * DISCOUNT).toFixed(2);
+    // console.log(`Total price: ${total_price}`);
+    // console.log(`Price after discount: ${price_after_discount}`);
 
     // 新增訂單
     // orders.push({ fruit: fruit.name, quantity, totalAmount: total, fruitId, supplier: fruit.supplier, deliveryDate });
 
     // 更新總金額
-    totalAmount += total;
+    // totalAmount += total;
 
     // 顯示結果
     const resultDiv = document.getElementById('result');
@@ -451,18 +452,23 @@ async function purchaseFruit() {
 
     // 更新下拉清單
     updateFruitSelect();
+
+    updateFruitSelect();
 }
 
 // 更新訂單狀況顯示
 function updateOrderStatus() {
     const orderListDiv = document.getElementById('order-list');
-    orderListDiv.innerHTML = orders.map((order, index) => `
+    // orderListDiv.innerHTML = orders.map((order, index) => `
+    orderListDiv.innerHTML = Object.entries(orders).map(([transaction_id, transaction_info])=> `
         <p>
-            訂單 ${index + 1}: ${order.fruit} - ${order.quantity} 顆 - ${order.totalAmount} 元
-            (供應商: ${order.supplier}, 交運日期: ${order.deliveryDate})
-            <span class="delete-button" onclick="deleteOrder(${index})">刪除</span>
+            訂單編號 ${transaction_id}: ${transaction_info.get('fruit_id')} ${transaction_info.get('fruit_name')} - ${transaction_info.get('purchase_quantity')} 顆 - ${transaction_info.get('price_after_discount')} 元
+            (供應商: ${transaction_info.get('supplier_name')}, 交運日期: ${transaction_info.get('transaction_date')})
+            <span class="delete-button" onclick="deleteOrder(${transaction_id})">刪除</span>
         </p>
-    `).join('');
+    `
+    ).join('');
+    console.log(orderListDiv.innerHTML);
 
     // 更新總金額
     const totalAmountDiv = document.getElementById('total-amount');
@@ -488,23 +494,23 @@ function validateNumericInput(input) {
 
 // 刪除訂單功能
 function deleteOrder(orderIndex) {
-    const order = orders[orderIndex];
-    const fruit = fruitDatabase[order.fruitId];
+    // const order = orders[orderIndex];
+    // const fruit = fruitDatabase[order.fruitId];
 
-    // 恢復庫存
-    fruit.stock += order.quantity;
+    // // 恢復庫存
+    // fruit.stock += order.quantity;
 
-    // 刪除訂單
-    orders.splice(orderIndex, 1);
+    // // 刪除訂單
+    // orders.splice(orderIndex, 1);
 
-    // 更新總金額
-    totalAmount -= order.totalAmount;
+    // // 更新總金額
+    // totalAmount -= order.totalAmount;
 
-    // 更新訂單狀況
-    updateOrderStatus();
+    // // 更新訂單狀況
+    // updateOrderStatus();
 
-    // 更新下拉清單
-    updateFruitSelect();
+    // // 更新下拉清單
+    // updateFruitSelect();
 }
 
 function setDateRestriction() {
