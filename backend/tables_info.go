@@ -165,6 +165,7 @@ var transactions Table = Table{
 	name: "transactions",
 	create: `
 	CREATE TABLE transactions (
+		transaction_id INT UNIQUE AUTO_INCREMENT, 												-- 交易編號	
 		fruit_id VARCHAR(13),    														-- 水果編號 (格式: YY-YYY-YYY-YY)  --> foreign key to fruits
 		member_id VARCHAR(10) , 														-- 會員身份證字號  格式: 1 英文字母 + 9 數字 --> foreign key to members
 		fruit_name VARCHAR(12) NOT NULL,          										-- 水果名稱 (最多 12 個字元)	
@@ -198,6 +199,7 @@ var transactions Table = Table{
 		VALUES ('12-345-678-92', 'B187654321', '橘子', '天空水果批發公司', 22, 20.00, '2022-11-04', '2022-11-06', '2022-11-06', 387.20)`,
 	},
 	display_attributes: []string{
+		"transaction_id",
 		"fruit_id",
 		"member_id",
 		"fruit_name",
