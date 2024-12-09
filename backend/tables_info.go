@@ -61,15 +61,17 @@ var members Table = Table{
 		age INT CHECK (age >= 0),
 		photo LONGTEXT, -- Base64
 		discount DECIMAL(3, 2) DEFAULT 1.00 CHECK (discount >= 0 AND discount <= 1) DEFAULT 0.88,
-		display TINYINT(1) NOT NULL DEFAULT 1
+		display TINYINT(1) NOT NULL DEFAULT 1,
+		username VARCHAR(20) NOT NULL,
+		password VARCHAR(20) NOT NULL
 	)`,
 	insert: []string{
-		`INSERT INTO members (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
-		VALUES ('B123456789', '純純', '0423456666', '0910000000', 'xxxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88)`,
-		`INSERT INTO members (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
-		VALUES ('B187654321', '一純純', '0423456666', '0910000001', 'yxxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88)`,
-		`INSERT INTO members (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
-		VALUES ('C123456789', '二純純', '0423456666', '0910000001', 'yyxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88)`,
+		`INSERT INTO members (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount, username, password) 
+		VALUES ('B123456789', '純純', '0423456666', '0910000000', 'xxxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88, 'afaifai', '123456789')`,
+		`INSERT INTO members (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount, username, password) 
+		VALUES ('B187654321', '一純純', '0423456666', '0910000001', 'yxxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88, 'afaifai', '123456789')`,
+		`INSERT INTO members (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount, username, password) 
+		VALUES ('C123456789', '二純純', '0423456666', '0910000001', 'yyxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88, 'afaifai', '123456789')`,
 	},
 	display_attributes: []string{
 		"member_id",
@@ -82,6 +84,8 @@ var members Table = Table{
 		"age",
 		"photo",
 		"discount",
+		"username",
+		"password",
 	},
 }
 
@@ -99,15 +103,17 @@ var inactive Table = Table{
 		age INT CHECK (age >= 0),
 		photo LONGTEXT, -- Base64
 		discount DECIMAL(3, 2) DEFAULT 1.00 CHECK (discount >= 0 AND discount <= 1) DEFAULT 0.88,
-		display TINYINT(1) NOT NULL DEFAULT 1
+		display TINYINT(1) NOT NULL DEFAULT 1,
+		username VARCHAR(20) NOT NULL,
+		password VARCHAR(20) NOT NULL
 	)`,
 	insert: []string{
-		`INSERT INTO inactive (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
-		VALUES ('D123456789', '三純純', '0423456666', '0910000000', 'xxxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88)`,
-		`INSERT INTO inactive (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
-		VALUES ('E123456789', '四純純', '0423456666', '0910000001', 'yxxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88)`,
-		`INSERT INTO inactive (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount) 
-		VALUES ('F123456789', '五純純', '0423456666', '0910000001', 'yyxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88)`,
+		`INSERT INTO inactive (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount, username, password) 
+		VALUES ('D123456789', '三純純', '0423456666', '0910000000', 'xxxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88, 'afaifai', '123456789')`,
+		`INSERT INTO inactive (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount, username, password) 
+		VALUES ('E123456789', '四純純', '0423456666', '0910000001', 'yxxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88, 'afaifai', '123456789')`,
+		`INSERT INTO inactive (member_id, member_name, phone_number, mobile_number, email, joined_line, address, age, discount, username, password) 
+		VALUES ('F123456789', '五純純', '0423456666', '0910000001', 'yyxx@thu.edu.tw', '是', '台中市仰德大道 YY 號', 20, 0.88, 'afaifai', '123456789')`,
 	},
 	display_attributes: []string{
 		"member_id",
@@ -120,6 +126,8 @@ var inactive Table = Table{
 		"age",
 		"photo",
 		"discount",
+		"username",
+		"password",
 	},
 }
 
