@@ -90,7 +90,8 @@ img {
 
 .action-buttons button.operation-btn,
 .action-buttons button.print-btn,
-.action-buttons button.sort-btn {
+.action-buttons button.sort-btn,
+.action-buttons button.help-btn {
   padding: 8px 12px;
   margin-right: 10px;
   margin-bottom: 5px;
@@ -106,14 +107,16 @@ img {
 
 .action-buttons button.operation-btn:hover,
 .action-buttons button.print-btn:hover,
-.action-buttons button.sort-btn:hover {
+.action-buttons button.sort-btn:hover,
+.action-buttons button.help-btn:hover {
   background-color: #0056b3;
   border-color: #0056b3;
 }
 
 .action-buttons button.operation-btn:active,
 .action-buttons button.print-btn:active,
-.action-buttons button.sort-btn:active {
+.action-buttons button.sort-btn:active,
+.action-buttons button.help-btn:active {
   transform: scale(0.95);
 }
 
@@ -135,6 +138,16 @@ img {
 .action-buttons button.sort-btn:hover {
   background-color: #442088;
   border-color: #442088;
+}
+
+.action-buttons button.help-btn {
+  border: 1px solid #b30e0e;
+  background-color: #e61414;
+}
+
+.action-buttons button.help-btn:hover {
+  background-color: #570505;
+  border-color: #6b0606;
 }
 
 /* Modal樣式 */
