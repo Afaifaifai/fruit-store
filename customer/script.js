@@ -160,7 +160,7 @@ async function login() {
             // DISCOUNT = parseFloat(messagesMapArray[0].get('discount'));
             // MEMBER_ID = member_id;
             
-            window.location.href = "private.html";
+            window.location.href = "customer_private.html";
         }
     }
     catch (error) {
