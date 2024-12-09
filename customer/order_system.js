@@ -1,18 +1,5 @@
 // 模擬水果資料庫
-let fruitDatabase = {
-    "001": { name: "蘋果", price: 30, stock: 100, supplier: "小明水果供應商" },
-    "002": { name: "香蕉", price: 20, stock: 120, supplier: "小華水果供應商" },
-    "003": { name: "柳橙", price: 25, stock: 150, supplier: "小英水果供應商" },
-    "004": { name: "葡萄", price: 50, stock: 80, supplier: "小美水果供應商" },
-    "005": { name: "哈密瓜", price: 60, stock: 50, supplier: "小英水果供應商" },
-    "006": { name: "奇異果", price: 40, stock: 90, supplier: "小明水果供應商" },
-    "007": { name: "水蜜桃", price: 45, stock: 60, supplier: "小華水果供應商" },
-    "008": { name: "櫻桃", price: 80, stock: 30, supplier: "小美水果供應商" },
-    "009": { name: "鳳梨", price: 35, stock: 100, supplier: "小英水果供應商" },
-    "010": { name: "梨子", price: 55, stock: 40, supplier: "小美水果供應商" },
-    "011": { name: "草莓", price: 70, stock: 50, supplier: "小華水果供應商" },
-    "012": { name: "西瓜", price: 40, stock: 90, supplier: "小明水果供應商" }
-};
+let fruitDatabase = [];
 
 // 訂單陣列和總金額
 let orders = [];
@@ -20,13 +7,46 @@ let totalAmount = 0;
 
 // 初始化水果選單
 function updateFruitSelect() {
+    update_fruit_date();
     const select = document.getElementById('fruit-select');
     select.innerHTML = '<option value="">選擇水果</option>';
-    Object.keys(fruitDatabase).forEach(fruitId => {
-        const fruit = fruitDatabase[fruitId];
-        const salePrice = fruit.price.toFixed(2);
-        select.innerHTML += `<option value="${fruitId}">${fruit.name} - 標準售價: $${salePrice} (庫存: ${fruit.stock})</option>`;
-    });
+    fruitDatabase.forEach(fruit_tuple => {
+        const salePrice = (parseFloat(fruit_tuple.get('purchase_price')) * 1.5).toFixed(2);
+        select.innerHTML += `<option value="編號: ${fruit_tuple.get('fruit_id')} - 名稱: ${fruit_tuple.get('fruit_name')}> - 標準售價: $${salePrice} (庫存: ${fruit_tuple.get('quantity')})</option>`;
+    }); 
+    console.log(select.innerHTML);
+}
+
+async function update_fruit_date() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/fruits/all`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const response_data = await response.json();
+
+        if (response.ok) {
+            console.log('Success:', response_data.status);
+            console.log('Messages:', response_data.messages);
+            let messagesMapArray = [];
+            if (response_data.messages && Array.isArray(response_data.messages)) {
+                response_data.messages.forEach(message => {
+                    const map = new Map(Object.entries(message));
+                    messagesMapArray.push(map);
+                });
+            }
+            fruitDatabase = messagesMapArray;
+        } else {
+            console.error('無法取得水果資料:', response_data.error);
+            alert(`無法取得水果資料: ${response_data.error}`);
+        }
+    }
+    catch (error) {
+        console.error('無法取得水果資料:', error);
+        alert('無法取得水果資料！' + error);
+    }
 }
 
 // 下單功能

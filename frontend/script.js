@@ -5,12 +5,14 @@ let selectedRow = null;
 let pendingOperation = null; // 用於追蹤當前的操作（add, select, edit, delete）
 let pendingTable = null; // 用於追蹤當前操作的表格
 
+
+// render table 用
 const TABLE_ATTRIBUTE = new Map([
-  ["fruits", ["fruit_id", "fruit_name", "supplier_name", "quantity", "unit", "purchase_price", "total_value", "storage_location", "purchase_date", "promotion_start_date", "discard_date"]],
-  ["members", ["member_id", "member_name", "phone_number", "mobile_number", "email", "joined_line", "address", "age", "photo", "discount"]],
-  ["inactive", ["member_id", "member_name", "phone_number", "mobile_number", "email", "joined_line", "address", "age", "photo", "discount"]],
-  ["suppliers",["supplier_id", "supplier_name", "phone_number", "email", "address", "contact_name"]],
-  ["transactions", ["transaction_id", "fruit_id", "member_id", "fruit_name", "supplier_name", "purchase_quantity", "sale_price", "total_price", "price_after_discount", "transaction_date", "expected_shipping_date", "actual_shipping_date"]]
+    ["fruits", ["fruit_id", "fruit_name", "supplier_name", "quantity", "unit", "purchase_price", "total_value", "storage_location", "purchase_date", "promotion_start_date", "discard_date"]],
+    ["members", ["member_id", "member_name", "phone_number", "mobile_number", "email", "joined_line", "address", "age", "photo", "discount"]],
+    ["inactive", ["member_id", "member_name", "phone_number", "mobile_number", "email", "joined_line", "address", "age", "photo", "discount"]],
+    ["suppliers",["supplier_id", "supplier_name", "phone_number", "email", "address", "contact_name"]],
+    ["transactions", ["transaction_id", "fruit_id", "member_id", "fruit_name", "supplier_name", "purchase_quantity", "sale_price", "total_price", "price_after_discount", "transaction_date", "expected_shipping_date", "actual_shipping_date"]]
 ]);
 
 let current_tuples = null;

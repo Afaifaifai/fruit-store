@@ -165,7 +165,7 @@ var transactions Table = Table{
 	name: "transactions",
 	create: `
 	CREATE TABLE transactions (
-		transaction_id INT UNIQUE AUTO_INCREMENT, 												-- 交易編號	
+		transaction_id INT UNIQUE AUTO_INCREMENT, 										-- 交易編號	
 		fruit_id VARCHAR(13),    														-- 水果編號 (格式: YY-YYY-YYY-YY)  --> foreign key to fruits
 		member_id VARCHAR(10) , 														-- 會員身份證字號  格式: 1 英文字母 + 9 數字 --> foreign key to members
 		fruit_name VARCHAR(12) NOT NULL,          										-- 水果名稱 (最多 12 個字元)	
@@ -178,10 +178,16 @@ var transactions Table = Table{
 		expected_shipping_date DATE NOT NULL,                							-- 預計交運日期
 		actual_shipping_date DATE,                         								-- 實際交運日期日期
 		display TINYINT(1) NOT NULL DEFAULT 1,
+		shipped TINYINT(1) AS (
+			CASE
+				WHEN actual_shipping_date IS NULL THEN 0
+				ELSE 1
+			END
+		) VIRTUAL,
 		
 		CHECK (purchase_quantity >= 0 AND purchase_quantity <= 999999),
 
-		PRIMARY KEY (fruit_id, member_id),
+		PRIMARY KEY (transaction_id, fruit_id, member_id),
 		
 		FOREIGN KEY (fruit_id) REFERENCES fruits(fruit_id)
 			ON DELETE CASCADE
@@ -222,4 +228,5 @@ var Digit_attributes map[string]string = map[string]string{
 	"purchase_quantity": "20",
 	"sale_price":        "20.00",
 	"total_value":       "600.00",
+	"shipped":           "0",
 }

@@ -1,5 +1,8 @@
 const API_BASE_URL = 'http://localhost:8080/api'; // 後端 API 的基礎網址
 
+let DISCOUNT = 0.88;
+let MEMBER_ID = "B123456789";
+
 // 切換顯示登入和創建帳號介面
 function showLogin() {
     document.getElementById('login-container').classList.add('active');
@@ -174,6 +177,9 @@ async function verify(member_id, username, password) {
             console.log(messagesMapArray[0].get('password'));
             if (messagesMapArray[0].get('username') === username && messagesMapArray[0].get('password') === password) {
                 alert('登入成功！');
+                DISCOUNT = parseFloat(messagesMapArray[0].get('discount'));
+                MEMBER_ID = member_id;
+                
                 window.location.href = "order_system.html";
             }
             else {
@@ -187,6 +193,298 @@ async function verify(member_id, username, password) {
     }
     catch (error) {
         console.error('查詢資料失敗:', error);
-        alert('無法查詢資料，請檢查後端伺服器狀態！' + error);
+        alert('查無此用戶！');
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Order system
+// 模擬水果資料庫
+let fruitDatabase = {}; // key : fruit_id, value : map of fruit_information
+
+// 訂單陣列和總金額
+let orders = {};
+let totalAmount = 0;
+
+// 初始化水果選單
+async function updateFruitSelect() {
+    // update_fruit_date();
+    try {
+        const response = await fetch(`${API_BASE_URL}/fruits/all`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const response_data = await response.json();
+
+        if (response.ok) {
+            console.log('Success:', response_data.status);
+            console.log('Messages:', response_data.messages);
+            let messagesMap = {};
+            if (response_data.messages && Array.isArray(response_data.messages)) {
+                response_data.messages.forEach(message => {
+                    const map = new Map(Object.entries(message));
+                    messagesMap[map.get('fruit_id')] = map;
+                });
+            }
+            fruitDatabase = messagesMap;
+            console.log('取得水果資料');
+        } else {
+            console.error('無法取得水果資料:', response_data.error);
+            alert(`無法取得水果資料: ${response_data.error}`);
+        }
+    }
+    catch (error) {
+        console.error('無法取得水果資料:', error);
+        alert('無法取得水果資料！' + error);
+    }
+
+
+    const select = document.getElementById('fruit-select');
+    select.innerHTML = '<option value="">選擇水果</option>';
+    Object.entries(fruitDatabase).forEach(([fruit_id, fruit_tuple] )=> {
+        const salePrice = (parseFloat(fruit_tuple.get('purchase_price')) * 1.5).toFixed(2);
+        select.innerHTML += `<option value=${fruit_id}>編號: ${fruit_tuple.get('fruit_id')} - 名稱: ${fruit_tuple.get('fruit_name')} - 標準售價: $${salePrice} (庫存: ${fruit_tuple.get('quantity')})</option>`;
+        console.log(`<option value=${fruit_id}>編號: ${fruit_tuple.get('fruit_id')} - 名稱: ${fruit_tuple.get('fruit_name')}> - 標準售價: $${salePrice} (庫存: ${fruit_tuple.get('quantity')})</option>`);
+    });
+}
+
+// 下單功能
+async function purchaseFruit() {
+    const fruit_id = document.getElementById('fruit-select').value;
+    const quantity = parseInt(document.getElementById('purchase-quantity').value, 10);
+    const deliveryDate = document.getElementById('delivery-date').value;
+    const input_price = parseFloat(document.getElementById('purchase-price').value);
+
+    if (!fruit_id || isNaN(quantity) || quantity <= 0 || !deliveryDate || isNaN(input_price) || input_price <= 0) {
+        alert("請填寫完整資訊，且確保購買數量和購買價格為有效數字！");
+        return;
+    }
+
+    const fruit_tuple = fruitDatabase[fruit_id];
+    const sale_price = fruit_tuple.get('purchase_price') * 1.5;
+
+    if (fruit_tuple.get('quantity') < quantity) {
+        alert("庫存不足");
+        return;
+    }
+
+    if (input_price < sale_price) {
+        alert(`購買價格必須高於標準售價 $${salePrice.toFixed(2)}`);
+        return;
+    }
+
+    data = {
+        "fruit_id": fruit_id,
+        "member_id": MEMBER_ID,
+        "fruit_name": fruit_tuple.get('fruit_name'),
+        "supplier_name": fruit_tuple.get('supplier_name'),
+        "purchase_quantity": String(quantity), // int
+        "sale_price": String(input_price), // float
+        "transaction_date": getTodayDate(),
+        "expected_shipping_date": deliveryDate
+    }
+
+    let transaction_success = false;
+    // Insert into transactions table
+    try {
+        console.log("Member id", MEMBER_ID);
+        const response = await fetch(`${API_BASE_URL}/transactions/insert`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        const response_data = await response.json();
+
+        if (response.ok) {
+            console.log('Success:', response_data.status);
+            console.log('Messages:', response_data.messages);
+            transaction_success = true;
+            alert('下單成功！');
+            
+        } else {
+            console.log('下單失敗:', response_data.error);
+            alert(`下單失敗: ${response_data.error}`);
+        }
+    }
+    catch (error) {
+        console.log('下單失敗:', error);
+        alert(`下單失敗: ${error}`);
+    }
+
+    // Select transactions by member_id, sipped = 0 (Reload)
+    select_conditions = {
+        "member_id": MEMBER_ID,
+        "shipped": "0"
+    }
+    try {
+        const response = await fetch(`${API_BASE_URL}/transactions/select`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(select_conditions)
+        });
+        const response_data = await response.json();
+
+        if (response.ok) {
+            console.log('Success:', response_data.status);
+            console.log('Messages:', response_data.messages);
+            let new_orders = {};
+            if (response_data.messages && Array.isArray(response_data.messages)) {
+                response_data.messages.forEach(message => {
+                    const map = new Map(Object.entries(message));
+                    new_orders[map.get('transaction_id')] = map;
+                });
+            }
+            console.log('查詢未完成訂單成功');
+            orders = new_orders;
+        } else {
+            console.log('查詢未完成訂單失敗:', response_data.error);
+            alert(`查詢未完成訂單失敗: ${response_data.error}`);
+        }
+    }
+    catch (error) {
+        console.log('查詢未完成訂單失敗:', error);
+        alert(`查詢未完成訂單失敗: ${error}`);
+    }
+
+
+
+    // 扣除庫存
+    let new_quantity = fruit_tuple.get('quantity') - quantity;
+    
+    // Update quantity in fruit table
+    if (transaction_success) {
+        let conditions = {'fruit_id': fruit_id}, updates = {'quantity': String(new_quantity)};
+        // data = ; // { conditions, updates }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/fruits/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({conditions, updates})
+            });
+            const response_data = await response.json();
+    
+            if (response.ok) {
+                console.log('Success:', response_data.status);
+                console.log('Messages:', response_data.messages);
+                alert('更新水果數量成功');
+                
+            } else {
+                console.log('更新水果數量失敗:', response_data.error);
+                alert(`更新水果數量失敗: ${response_data.error}`);
+            }
+        }
+        catch (error) {
+            console.log('更新水果數量失敗:', error);
+            alert(`更新水果數量失敗: ${error}`);
+        }
+    }
+
+    // 計算金額
+    const total_price = (sale_price * quantity).toFixed(2);
+    const price_after_discount = (total_price * DISCOUNT).toFixed(2);
+    console.log(`Total price: ${total_price}`);
+    console.log(`Price after discount: ${price_after_discount}`);
+
+    // 新增訂單
+    // orders.push({ fruit: fruit.name, quantity, totalAmount: total, fruitId, supplier: fruit.supplier, deliveryDate });
+
+    // 更新總金額
+    totalAmount += total;
+
+    // 顯示結果
+    const resultDiv = document.getElementById('result');
+    // resultDiv.innerHTML = `<p>已成功下單：${fruit.name} - ${quantity} 顆，總金額：${total} 元，交運日期：${deliveryDate}，供應商:${fruit.supplier}</p>`;
+
+    // 更新訂單狀況
+    updateOrderStatus();
+
+    // 更新下拉清單
+    updateFruitSelect();
+}
+
+// 更新訂單狀況顯示
+function updateOrderStatus() {
+    const orderListDiv = document.getElementById('order-list');
+    orderListDiv.innerHTML = orders.map((order, index) => `
+        <p>
+            訂單 ${index + 1}: ${order.fruit} - ${order.quantity} 顆 - ${order.totalAmount} 元
+            (供應商: ${order.supplier}, 交運日期: ${order.deliveryDate})
+            <span class="delete-button" onclick="deleteOrder(${index})">刪除</span>
+        </p>
+    `).join('');
+
+    // 更新總金額
+    const totalAmountDiv = document.getElementById('total-amount');
+    totalAmountDiv.textContent = totalAmount;
+}
+
+function getTodayDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // 月份從 0 開始
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+console.log(getTodayDate()); // 輸出格式為 "yyyy-mm-dd"
+
+
+// 確保只能輸入數字
+function validateNumericInput(input) {
+    input.value = input.value.replace(/[^0-9]/g, ''); // 只允許數字
+}
+
+
+// 刪除訂單功能
+function deleteOrder(orderIndex) {
+    const order = orders[orderIndex];
+    const fruit = fruitDatabase[order.fruitId];
+
+    // 恢復庫存
+    fruit.stock += order.quantity;
+
+    // 刪除訂單
+    orders.splice(orderIndex, 1);
+
+    // 更新總金額
+    totalAmount -= order.totalAmount;
+
+    // 更新訂單狀況
+    updateOrderStatus();
+
+    // 更新下拉清單
+    updateFruitSelect();
+}
+
+function setDateRestriction() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const minDate = `${year}-${month}-${day}`;
+    document.getElementById('delivery-date').setAttribute('min', minDate);
+}
+setDateRestriction();
+
+// 初始化頁面
+updateFruitSelect();
