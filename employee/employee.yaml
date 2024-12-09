@@ -1,38 +1,44 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
+  name: employee
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: frontend
+      app: employee
   template:
     metadata:
       labels:
-        app: frontend
+        app: employee
     spec:
       containers:
-      - name: frontend
+      - name: employee
         image: ycair/afaifaifai-frontend # 替換為你構建的前端 Docker 映像名稱
         ports:
         - containerPort: 80
         volumeMounts:
         - mountPath: /usr/share/nginx/html
-          name: frontend-volume
+          name: employee-volume
+        - name: employee-nginx-config-volume
+          mountPath: /etc/nginx/conf.d
+
       volumes:
-      - name: frontend-volume
+      - name: employee-nginx-config-volume
+        configMap:
+          name: employee-nginx-config
+      - name: employee-volume
         persistentVolumeClaim:
-          claimName: frontend-pvc
+          claimName: employee-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
+  name: employee
 spec:
   ports:
   - port: 80
     targetPort: 80
   selector:
-    app: frontend
+    app: employee
 
