@@ -89,7 +89,8 @@ img {
 }
 
 .action-buttons button.operation-btn,
-.action-buttons button.print-btn {
+.action-buttons button.print-btn,
+.action-buttons button.sort-btn {
   padding: 8px 12px;
   margin-right: 10px;
   margin-bottom: 5px;
@@ -104,13 +105,15 @@ img {
 }
 
 .action-buttons button.operation-btn:hover,
-.action-buttons button.print-btn:hover {
+.action-buttons button.print-btn:hover,
+.action-buttons button.sort-btn:hover {
   background-color: #0056b3;
   border-color: #0056b3;
 }
 
 .action-buttons button.operation-btn:active,
-.action-buttons button.print-btn:active {
+.action-buttons button.print-btn:active,
+.action-buttons button.sort-btn:active {
   transform: scale(0.95);
 }
 
@@ -122,6 +125,16 @@ img {
 .action-buttons button.print-btn:hover {
   background-color: #1e7e34;
   border-color: #1e7e34;
+}
+
+.action-buttons button.sort-btn {
+  border: 1px solid #6e41e9;
+  background-color: #6e41e9;
+}
+
+.action-buttons button.sort-btn:hover {
+  background-color: #442088;
+  border-color: #442088;
 }
 
 /* Modal樣式 */
@@ -265,4 +278,25 @@ tr.selected {
   to {
     transform: translate(-50%, -50%) rotate(360deg);
   }
+}
+
+.transaction-total-container {
+  display: flex;
+  flex-direction: column; /* 垂直排列 */
+  align-items: flex-start; /* 左對齊 */
+  font-weight: bold;
+  padding: 10px;
+  background-color: #f9f9f9; /* 淺灰色背景 */
+  border: 1px solid #ddd; /* 邊框 */
+  border-radius: 5px; /* 圓角 */
+  max-width: 200px; /* 限制寬度 */
+}
+
+.transaction-item {
+  margin-bottom: 5px; /* 每個項目間距 */
+  font-size: 16px; /* 調整字體大小 */
+}
+
+.transaction-total-container span {
+  color: #007bff; /* 使用藍色強調文字 */
 }

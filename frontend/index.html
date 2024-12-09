@@ -82,10 +82,10 @@
     <div id="inactive" class="table-container hidden">
       <h2>靜止會員資料表</h2>
       <div class="action-buttons">
-        <button class="operation-btn" onclick="openModal('inactive', 'add')">新增</button>
+        <!-- <button class="operation-btn" onclick="openModal('inactive', 'add')">新增</button> -->
         <button class="operation-btn" onclick="openModal('inactive', 'select')">查詢</button>
         <button class="operation-btn" onclick="openModal('inactive', 'edit')">修改</button>
-        <button class="operation-btn" onclick="openModal('inactive', 'delete')">刪除</button>
+        <button class="operation-btn" onclick="openModal('inactive', 'delete')">移轉</button>
         <button class="print-btn" onclick="printTable('inactive')">列印</button>
       </div>
       <table>
@@ -135,16 +135,34 @@
     <!-- 交易資料表 -->
     <div id="transactions" class="table-container hidden">
       <h2>交易資料表</h2>
-      <div class="action-buttons">
-        <button class="operation-btn" onclick="openModal('transactions', 'add')">新增</button>
-        <button class="operation-btn" onclick="openModal('transactions', 'select')">查詢</button>
-        <button class="operation-btn" onclick="openModal('transactions', 'edit')">修改</button>
-        <button class="operation-btn" onclick="openModal('transactions', 'delete')">刪除</button>
-        <button class="print-btn" onclick="printTable('transactions')">列印</button>
+      <!-- 新增的顯示總金額區塊 -->
+      <div class="action-buttons" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <button class="operation-btn" onclick="openModal('transactions', 'add')">新增</button>
+          <button class="operation-btn" onclick="openModal('transactions', 'select')">查詢</button>
+          <button class="operation-btn" onclick="openModal('transactions', 'edit')">修改</button>
+          <button class="operation-btn" onclick="openModal('transactions', 'delete')">刪除</button>
+          <button class="print-btn" onclick="printTable('transactions')">列印</button>
+          <button class="sort-btn" onclick="shipped_sort()">已出貨</button>
+          <button class="sort-btn" onclick="unshipped_sort()">未出貨</button>
+        </div>
+        <!-- 在右上角顯示總金額的區域 -->
+        <div class="transaction-total-container" style="font-weight:bold;">
+          <div class="transaction-item">
+            總金額：<span id="transaction-total">0</span>
+          </div>
+          <div class="transaction-item">
+            已出貨：<span id="transaction-shipped">0</span>
+          </div>
+          <div class="transaction-item">
+            未出貨：<span id="transaction-unshipped">0</span>
+          </div>
+        </div>
       </div>
       <table>
         <thead>
           <tr>
+            <th>交易編號</th>
             <th>水果編號</th>
             <th>會員身分證字號</th>
             <th>水果名稱</th>
@@ -175,5 +193,8 @@
   </div>
 
   <script src="script.js"></script>
+  <!-- <script>
+    
+  </script> -->
 </body>
 </html>

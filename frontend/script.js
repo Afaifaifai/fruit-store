@@ -5,6 +5,18 @@ let selectedRow = null;
 let pendingOperation = null; // 用於追蹤當前的操作（add, select, edit, delete）
 let pendingTable = null; // 用於追蹤當前操作的表格
 
+
+// render table 用
+const TABLE_ATTRIBUTE = new Map([
+    ["fruits", ["fruit_id", "fruit_name", "supplier_name", "quantity", "unit", "purchase_price", "total_value", "storage_location", "purchase_date", "promotion_start_date", "discard_date"]],
+    ["members", ["member_id", "member_name", "phone_number", "mobile_number", "email", "joined_line", "address", "age", "photo", "discount"]],
+    ["inactive", ["member_id", "member_name", "phone_number", "mobile_number", "email", "joined_line", "address", "age", "photo", "discount"]],
+    ["suppliers",["supplier_id", "supplier_name", "phone_number", "email", "address", "contact_name"]],
+    ["transactions", ["transaction_id", "fruit_id", "member_id", "fruit_name", "supplier_name", "purchase_quantity", "sale_price", "total_price", "price_after_discount", "transaction_date", "expected_shipping_date", "actual_shipping_date"]]
+]);
+
+let current_tuples = null;
+
 // 動態加載表格資料
 function loadData(table) {
   const tables = document.querySelectorAll('.table-container');
@@ -17,54 +29,42 @@ function loadData(table) {
 }
 
 // 從後端 API 獲取資料
-async function fetchData(table) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/${table}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data = await response.json();
-    renderTable(table, data);
-  } catch (error) {
-    console.error('資料加載失敗:', error);
-    alert('無法加載資料，請檢查後端伺服器狀態！');
-  }
-}
+
 
 // 渲染表格內容
 function renderTable(table, data) {
-  const tableBody = document.querySelector(`#${table} tbody`);
-  tableBody.innerHTML = '';
-  data.forEach(row => {
-    const tr = document.createElement('tr');
-    Object.entries(row).forEach(([key, value]) => {
-      const td = document.createElement('td');
-      if (key.toLowerCase() === 'photo') { // 處理圖片欄位
-        const img = document.createElement('img');
-        img.src = value;
-        td.appendChild(img);
-      } else {
-        td.textContent = value;
-        // 為住址欄位添加工具提示
-        if ((table === 'members' || table === 'inactive') && key.toLowerCase() === 'address') {
-          td.setAttribute('title', value);
-        }
-      }
-      tr.appendChild(td);
-    });
-    tableBody.appendChild(tr);
-  });
+  // const tableBody = document.querySelector(`#${table} tbody`);
+  // tableBody.innerHTML = '';
+  // data.forEach(row => {
+  //   const tr = document.createElement('tr');
+  //   Object.entries(row).forEach(([key, value]) => {
+  //     const td = document.createElement('td');
+  //     if (key.toLowerCase() === 'photo') { // 處理圖片欄位
+  //       const img = document.createElement('img');
+  //       img.src = value;
+  //       td.appendChild(img);
+  //     } else {
+  //       td.textContent = value;
+  //       // 為住址欄位添加工具提示
+  //       if ((table === 'members' || table === 'inactive') && key.toLowerCase() === 'address') {
+  //         td.setAttribute('title', value);
+  //       }
+  //     }
+  //     tr.appendChild(td);
+  //   });
+  //   tableBody.appendChild(tr);
+  // });
 
-  // 添加行點擊事件以選擇記錄
-  tableBody.querySelectorAll('tr').forEach(tr => {
-    tr.addEventListener('click', () => {
-      if (selectedRow) {
-        selectedRow.classList.remove('selected');
-      }
-      selectedRow = tr;
-      selectedRow.classList.add('selected');
-    });
-  });
+  // // 添加行點擊事件以選擇記錄
+  // tableBody.querySelectorAll('tr').forEach(tr => {
+  //   tr.addEventListener('click', () => {
+  //     if (selectedRow) {
+  //       selectedRow.classList.remove('selected');
+  //     }
+  //     selectedRow = tr;
+  //     selectedRow.classList.add('selected');
+  //   });
+  // });
 }
 
 // 開啟 Modal
@@ -141,26 +141,26 @@ function generateFruitsForm(table, action) {
       <label for="fruit_id">水果編號 <span style="color:red;">*</span>:</label>
       <input type="text" id="fruit_id" name="fruit_id" maxlength="13" pattern="\\d{2}-\\d{3}-\\d{3}-\\d{2}" ${required}>
 
-      <label for="fruit_name">水果名稱:</label>
-      <input type="text" id="fruit_name" name="fruit_name" maxlength="12">
+      <label for="fruit_name">水果名稱 <span style="color:red;">*</span>:</label>
+      <input type="text" id="fruit_name" name="fruit_name" maxlength="12" ${required}>
 
-      <label for="supplier_name">水果供應商名稱:</label>
-      <input type="text" id="supplier_name" name="supplier_name" maxlength="12">
+      <label for="supplier_name">水果供應商名稱 <span style="color:red;">*</span>:</label>
+      <input type="text" id="supplier_name" name="supplier_name" maxlength="12" ${required}>
 
       <label for="quantity">現有數量:</label>
       <input type="number" id="quantity" name="quantity" max="999999">
 
-      <label for="unit">單位:</label>
-      <input type="text" id="unit" name="unit" maxlength="4">
+      <label for="unit">單位 <span style="color:red;">*</span>:</label>
+      <input type="text" id="unit" name="unit" maxlength="4" ${required}>
 
       <label for="purchase_price">進貨單價:</label>
       <input type="number" step="0.01" id="purchase_price" name="purchase_price" max="999999.99">
 
-      <label for="storage_location">公司內存放位置:</label>
-      <input type="text" id="storage_location" name="storage_location" maxlength="12">
+      <label for="storage_location">公司內存放位置 <span style="color:red;">*</span>:</label>
+      <input type="text" id="storage_location" name="storage_location" maxlength="12" ${required}>
 
-      <label for="purchase_date">進貨日期:</label>
-      <input type="date" id="purchase_date" name="purchase_date">
+      <label for="purchase_date">進貨日期 <span style="color:red;">*</span>:</label>
+      <input type="date" id="purchase_date" name="purchase_date" ${required}>
 
       <label for="promotion_start_date">開始促銷日期:</label>
       <input type="date" id="promotion_start_date" name="promotion_start_date">
@@ -278,20 +278,20 @@ function generateMembersForm(table, action) {
       <label for="member_id">會員身分證字號 <span style="color:red;">*</span>:</label>
       <input type="text" id="member_id" name="member_id" maxlength="10" pattern="[A-Z]{1}\\d{9}" ${required}>
 
-      <label for="member_name">會員姓名:</label>
-      <input type="text" id="member_name" name="member_name" maxlength="12">
+      <label for="member_name">會員姓名 <span style="color:red;">*</span>:</label>
+      <input type="text" id="member_name" name="member_name" maxlength="12" ${required}>
 
       <label for="phone">電話:</label>
-      <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+      <input type="text" id="phone_number" name="phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
       <label for="mobile">手機號碼:</label>
-      <input type="text" id="mobile" name="mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}">
+      <input type="text" id="mobile_number" name="mobile_number" maxlength="16" pattern="\\d{4}\\d{3}\\d{3}">
 
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" maxlength="36">
+      <label for="email">Email <span style="color:red;">*</span>:</label>
+      <input type="email" id="email" name="email" maxlength="36" ${required}>
 
       <label for="line_joined">是否加入Line:</label>
-      <select id="line_joined" name="line_joined">
+      <select id="joined_line" name="joined_line">
         <option value="">請選擇</option>
         <option value="是">是</option>
         <option value="不是">不是</option>
@@ -307,7 +307,7 @@ function generateMembersForm(table, action) {
       <input type="file" id="photo" name="photo" accept="image/*">
 
       <label for="discount">會員折扣:</label>
-      <input type="number" step="0.01" id="discount" name="discount" min="0" max="9.99">
+      <input type="number" step="0.01" id="discount" name="discount" min="0" max="1.00">
     `;
   } else if (action === 'select' || action === 'delete') {
     // 查詢或修改模式，所有欄位均為選填
@@ -319,16 +319,16 @@ function generateMembersForm(table, action) {
       <input type="text" id="member_name" name="member_name" maxlength="12">
 
       <label for="phone">電話:</label>
-      <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+      <input type="text" id="phone_number" name="phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
       <label for="mobile">手機號碼:</label>
-      <input type="text" id="mobile" name="mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}">
+      <input type="text" id="mobile_number" name="mobile_number" maxlength="16" pattern="\\d{4}\\d{3}\\d{3}">
 
       <label for="email">Email:</label>
       <input type="email" id="email" name="email" maxlength="36">
 
       <label for="line_joined">是否加入Line:</label>
-      <select id="line_joined" name="line_joined">
+      <select id="joined_line" name="joined_line">
         <option value="">請選擇</option>
         <option value="是">是</option>
         <option value="不是">不是</option>
@@ -340,11 +340,8 @@ function generateMembersForm(table, action) {
       <label for="age">年齡:</label>
       <input type="number" id="age" name="age" min="0" max="9999">
 
-      <label for="photo">照片:</label>
-      <input type="file" id="photo" name="photo" accept="image/*">
-
       <label for="discount">會員折扣:</label>
-      <input type="number" step="0.01" id="discount" name="discount" min="0" max="9.99">
+      <input type="number" step="0.01" id="discount" name="discount" min="0" max="1.00">
     `;
   } else if (action === 'edit') {
     // 修改操作的表單：分為條件和修改數值兩個部分
@@ -358,16 +355,16 @@ function generateMembersForm(table, action) {
         <input type="text" id="condition_member_name" name="condition_member_name" maxlength="12">
 
         <label for="condition_phone">電話:</label>
-        <input type="text" id="condition_phone" name="condition_phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+        <input type="text" id="condition_phone_number" name="condition_phone" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
         <label for="condition_mobile">手機號碼:</label>
-        <input type="text" id="condition_mobile" name="condition_mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}">
+        <input type="text" id="condition_mobile_number" name="condition_mobile_number" maxlength="16" pattern="\\d{4}\\d{3}\\d{3}">
 
         <label for="condition_email">Email:</label>
         <input type="email" id="condition_email" name="condition_email" maxlength="36">
 
         <label for="condition_line_joined">是否加入Line:</label>
-        <select id="condition_line_joined" name="condition_line_joined">
+        <select id="condition_joined_line" name="condition_joined_line">
           <option value="">請選擇</option>
           <option value="是">是</option>
           <option value="不是">不是</option>
@@ -380,7 +377,7 @@ function generateMembersForm(table, action) {
         <input type="number" id="condition_age" name="condition_age" min="0" max="9999">
 
         <label for="condition_discount">會員折扣:</label>
-        <input type="number" step="0.01" id="condition_discount" name="condition_discount" min="0" max="9.99">
+        <input type="number" step="0.01" id="condition_discount" name="condition_discount" min="0" max="1.00">
       </div>
 
       <h3>修改數值</h3>
@@ -392,16 +389,16 @@ function generateMembersForm(table, action) {
         <input type="text" id="update_member_name" name="update_member_name" maxlength="12">
 
         <label for="update_phone">電話:</label>
-        <input type="text" id="update_phone" name="update_phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+        <input type="text" id="update_phone" name="update_phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
         <label for="update_mobile">手機號碼:</label>
-        <input type="text" id="update_mobile" name="update_mobile" maxlength="16" pattern="\\d{4}-\\d{3}-\\d{3}">
+        <input type="text" id="update_mobile_number" name="update_mobile_number" maxlength="16" pattern="\\d{4}\\d{3}\\d{3}">
 
         <label for="update_email">Email:</label>
         <input type="email" id="update_email" name="update_email" maxlength="36">
 
         <label for="update_line_joined">是否加入Line:</label>
-        <select id="update_line_joined" name="update_line_joined">
+        <select id="update_joined_line" name="update_joined_line">
           <option value="">請選擇</option>
           <option value="是">是</option>
           <option value="不是">不是</option>
@@ -413,8 +410,11 @@ function generateMembersForm(table, action) {
         <label for="update_age">年齡:</label>
         <input type="number" id="update_age" name="update_age" min="0" max="9999">
 
+        <label for="photo">照片:</label>
+        <input type="file" id="update_photo" name="update_photo" accept="image/*">
+
         <label for="update_discount">會員折扣:</label>
-        <input type="number" step="0.01" id="update_discount" name="update_discount" min="0" max="9.99">
+        <input type="number" step="0.01" id="update_discount" name="update_discount" min="0" max="1.00">
       </div>
     `;
   }
@@ -434,22 +434,22 @@ function generateSuppliersForm(table, action) {
   if (action === 'add') {
     formHTML += `
       <label for="supplier_id">供應商統一編號 <span style="color:red;">*</span>:</label>
-      <input type="text" id="supplier_id" name="supplier_id" maxlength="8" pattern="\\d{8}" ${action === 'add' ? required : ''}>
+      <input type="text" id="supplier_id" name="supplier_id" maxlength="8" pattern="\\d{8}" ${required}>
 
-      <label for="supplier_name">水果供應商名稱:</label>
-      <input type="text" id="supplier_name" name="supplier_name" maxlength="12">
+      <label for="supplier_name">水果供應商名稱 <span style="color:red;">*</span>:</label>
+      <input type="text" id="supplier_name" name="supplier_name" maxlength="12" ${required}>
 
       <label for="phone">電話:</label>
-      <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+      <input type="text" id="phone_number" name="phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" maxlength="36">
+      <label for="email">Email <span style="color:red;">*</span>:</label>
+      <input type="email" id="email" name="email" maxlength="36" ${required}>
 
       <label for="address">住址:</label>
       <textarea id="address" name="address" maxlength="60"></textarea>
 
-      <label for="manager_name">負責人姓名:</label>
-      <input type="text" id="manager_name" name="manager_name" maxlength="12">
+      <label for="manager_name">負責人姓名 <span style="color:red;">*</span>:</label>
+      <input type="text" id="contact_name" name="contact_name" maxlength="12" ${required}>
     `;
   } else if (action === 'select' || action === 'delete') {
     // 查詢或刪除模式，所有欄位均為選填
@@ -461,7 +461,7 @@ function generateSuppliersForm(table, action) {
       <input type="text" id="supplier_name" name="supplier_name" maxlength="12">
 
       <label for="phone">電話:</label>
-      <input type="text" id="phone" name="phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+      <input type="text" id="phone_number" name="phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
       <label for="email">Email:</label>
       <input type="email" id="email" name="email" maxlength="36">
@@ -470,7 +470,7 @@ function generateSuppliersForm(table, action) {
       <textarea id="address" name="address" maxlength="60"></textarea>
 
       <label for="manager_name">負責人姓名:</label>
-      <input type="text" id="manager_name" name="manager_name" maxlength="12">
+      <input type="text" id="contact_name" name="contact_name" maxlength="12">
     `;
   } else if (action === 'edit') {
     // 修改操作的表單：分為條件和修改數值兩個部分
@@ -484,7 +484,7 @@ function generateSuppliersForm(table, action) {
         <input type="text" id="condition_supplier_name" name="condition_supplier_name" maxlength="12">
 
         <label for="condition_phone">電話:</label>
-        <input type="text" id="condition_phone" name="condition_phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+        <input type="text" id="condition_phone_number" name="condition_phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
         <label for="condition_email">Email:</label>
         <input type="email" id="condition_email" name="condition_email" maxlength="36">
@@ -493,7 +493,7 @@ function generateSuppliersForm(table, action) {
         <textarea id="condition_address" name="condition_address" maxlength="60"></textarea>
 
         <label for="condition_manager_name">負責人姓名:</label>
-        <input type="text" id="condition_manager_name" name="condition_manager_name" maxlength="12">
+        <input type="text" id="condition_contact_name" name="condition_contact_name" maxlength="12">
       </div>
 
       <h3>修改數值</h3>
@@ -505,7 +505,7 @@ function generateSuppliersForm(table, action) {
         <input type="text" id="update_supplier_name" name="update_supplier_name" maxlength="12">
 
         <label for="update_phone">電話:</label>
-        <input type="text" id="update_phone" name="update_phone" maxlength="16" pattern="\\d{2}-\\d{4}-\\d{4}">
+        <input type="text" id="update_phone_number" name="update_phone_number" maxlength="16" pattern="\\d{2}\\d{4}\\d{4}">
 
         <label for="update_email">Email:</label>
         <input type="email" id="update_email" name="update_email" maxlength="36">
@@ -514,7 +514,7 @@ function generateSuppliersForm(table, action) {
         <textarea id="update_address" name="update_address" maxlength="60"></textarea>
 
         <label for="update_manager_name">負責人姓名:</label>
-        <input type="text" id="update_manager_name" name="update_manager_name" maxlength="12">
+        <input type="text" id="update_contact_name" name="update_contact_name" maxlength="12">
       </div>
     `;
   }
@@ -530,26 +530,26 @@ function generateTransactionsForm(table, action) {
       <label for="fruit_id">水果編號 <span style="color:red;">*</span>:</label>
       <input type="text" id="fruit_id" name="fruit_id" maxlength="13" pattern="\\d{2}-\\d{3}-\\d{3}-\\d{2}" ${required}>
 
-      <label for="member_id">會員身分證字號:</label>
-      <input type="text" id="member_id" name="member_id" maxlength="10" pattern="[A-Z]{1}\\d{9}">
+      <label for="member_id">會員身分證字號 <span style="color:red;">*</span>:</label>
+      <input type="text" id="member_id" name="member_id" maxlength="10" pattern="[A-Z]{1}\\d{9}" ${required}>
 
-      <label for="fruit_name">水果名稱:</label>
-      <input type="text" id="fruit_name" name="fruit_name" maxlength="12">
+      <label for="fruit_name">水果名稱 <span style="color:red;">*</span>:</label>
+      <input type="text" id="fruit_name" name="fruit_name" maxlength="12" ${required}>
 
-      <label for="supplier_name">水果供應商名稱:</label>
-      <input type="text" id="supplier_name" name="supplier_name" maxlength="12">
+      <label for="supplier_name">水果供應商名稱 <span style="color:red;">*</span>:</label>
+      <input type="text" id="supplier_name" name="supplier_name" maxlength="12" ${required}>
 
-      <label for="purchase_quantity">購買數量:</label>
-      <input type="number" id="purchase_quantity" name="purchase_quantity" max="999999">
+      <label for="purchase_quantity">購買數量 <span style="color:red;">*</span>:</label>
+      <input type="number" id="purchase_quantity" name="purchase_quantity" max="999999" ${required}>
 
-      <label for="sale_price">出售單價:</label>
-      <input type="number" step="0.01" id="sale_price" name="sale_price" max="999999.99">
+      <label for="sale_price">出售單價 <span style="color:red;">*</span>:</label>
+      <input type="number" step="0.01" id="sale_price" name="sale_price" max="999999.99" ${required}>
 
-      <label for="transaction_date">交易日期:</label>
-      <input type="date" id="transaction_date" name="transaction_date">
+      <label for="transaction_date">交易日期 <span style="color:red;">*</span>:</label>
+      <input type="date" id="transaction_date" name="transaction_date" ${required}>
 
-      <label for="expected_shipping_date">預計交運日期:</label>
-      <input type="date" id="expected_shipping_date" name="expected_shipping_date">
+      <label for="expected_shipping_date">預計交運日期 <span style="color:red;">*</span>:</label>
+      <input type="date" id="expected_shipping_date" name="expected_shipping_date" ${required}>
 
       <label for="actual_shipping_date">實際交運日期:</label>
       <input type="date" id="actual_shipping_date" name="actual_shipping_date"  >
@@ -731,56 +731,63 @@ document.getElementById('modal-form').addEventListener('submit', function(event)
       if (key.startsWith('condition_')) {
         // 條件部分
         const conditionKey = key.replace('condition_', '');
-        if (value) conditions[conditionKey] = value; // 忽略空值
+        if (value) 
+          conditions[conditionKey] = value; // 忽略空值
       } else if (key.startsWith('update_')) {
         // 更新數值部分
         const updateKey = key.replace('update_', '');
-        if (value) updates[updateKey] = value; // 忽略空值
+        if (value) 
+          updates[updateKey] = value; // 忽略空值2;
       } else {
         // 其他操作，例如新增或查詢
         data[key] = value;
       }
     });
   
-    if (operation === 'select') {
-      // 普通查詢操作
-      selectRecord(table, data).then(selectedData => {
-        if (selectedData.length === 1 && pendingOperation) {
-          const selectedRowData = selectedData[0];
-          openEditDeleteForm(operation, table, selectedRowData);
-        } else if (selectedData.length === 1 && !pendingOperation) {
-          // 若操作已經是 'edit' 或 'delete'，不進一步操作
-          closeModal();
-        } else if (selectedData.length === 0) {
-          alert('未找到符合條件的記錄。');
-        } else {
-          alert('請精確查詢僅選擇一條記錄。');
-        }
-      }).catch(error => {
-        console.error('查詢失敗:', error);
-        alert('查詢失敗，請稍後再試。');
-      });
-    } else if (operation === 'edit' || operation === 'delete') {
-      // 修改或刪除操作
-      if (operation === 'edit') {
-        if (Object.keys(conditions).length === 0) {
-          alert('請至少提供一個條件！');
-          return;
-        }
-        if (Object.keys(updates).length === 0) {
-          alert('請至少提供一個修改數值！');
-          return;
-        }
-        updateRecord(table, { conditions, updates });
-      } else if (operation === 'delete') {
-        if (Object.keys(conditions).length === 0) {
-          alert('請提供至少一個刪除條件！');
-          return;
-        }
-        deleteRecord(table, conditions);
-      }
+    if (operation === 'select') {  // 查詢
+      selectRecord(table, data)
       closeModal();
-    } else {
+      // 普通查詢操作
+      // selectRecord(table, data).then(selectedData => {
+      //   if (selectedData.messages.length === 1 && pendingOperation) {
+      //     const selectedRowData = selectedData[0];
+      //     openEditDeleteForm(operation, table, selectedRowData);
+      //   } else if (selectedData.length === 1 && !pendingOperation) {
+      //     // 若操作已經是 'edit' 或 'delete'，不進一步操作
+      //     closeModal();
+      //   } else if (selectedData.length === 0) {
+      //     alert('未找到符合條件的記錄。');
+      //   } else {
+      //     alert('請精確查詢僅選擇一條記錄。');
+      //   }
+      // }).catch(error => {
+      //   console.error('查詢失敗:', error);
+      //   alert('查詢失敗，請稍後再試。' + error);
+      // });
+    } else if (operation === 'edit') {
+      const photoInput = form.querySelector('input[type="file"]');
+        if (photoInput && photoInput.files.length > 0) {
+          const file = photoInput.files[0];
+          const reader = new FileReader();
+          reader.onloadend = function() {
+            // if (reader.result.length != 0) ///////////////////////
+            updates['photo'] = reader.result; // 將圖片轉換為 Base64
+            // alert(reader.result);
+            updateRecord(table, { conditions, updates });
+          };
+          reader.readAsDataURL(file);
+        } else if (photoInput && photoInput.files.length == 0) {
+          updates['photo'] = "";
+          updateRecord(table, { conditions, updates });
+        } else {
+          updateRecord(table, { conditions, updates });
+        }
+        closeModal();
+
+    } else if (operation === 'delete') {
+      deleteRecord(table, data);
+      closeModal();
+    } else {  //  新增
       // 其他操作（add）
       if (operation === 'add') {
         // 處理圖片上傳（將圖片轉換為 Base64 字符串）
@@ -789,10 +796,15 @@ document.getElementById('modal-form').addEventListener('submit', function(event)
           const file = photoInput.files[0];
           const reader = new FileReader();
           reader.onloadend = function() {
+            // if (reader.result.length != 0) ///////////////////////
             data['photo'] = reader.result; // 將圖片轉換為 Base64
+            // alert(reader.result);
             createRecord(table, data);
           };
           reader.readAsDataURL(file);
+        } else if (photoInput && photoInput.files.length == 0) {
+          data['photo'] = ''
+          createRecord(table, data)
         } else {
           createRecord(table, data);
         }
@@ -830,19 +842,21 @@ function getCurrentTable() {
 // 新增資料
 async function createRecord(table, data) {
   try {
-    const response = await fetch(`${API_BASE_URL}/${table}`, {
-      method: 'POST',
+    const response = await fetch(`${API_BASE_URL}/${table}/insert`, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
     });
+
+    // const data = await response.json();
     if (response.ok) {
       alert('新增成功！');
-      fetchData(table);
     } else {
-      const errorData = await response.json();
-      alert(`新增失敗：${errorData.message}`);
+        console.warn('No messages found in the response or messages is not an array.');
+        const response_data = await response.json();
+        alert(`新增失敗: ${response_data.error}`);
     }
   } catch (error) {
     console.error('新增資料失敗:', error);
@@ -880,7 +894,7 @@ async function updateRecord(table, data) {
   
       if (response.ok) {
         alert('修改成功！');
-        fetchData(table);
+        // fetchData(table);
       } else {
         const errorData = await response.json();
         alert(`修改失敗：${errorData.message}`);
@@ -900,9 +914,11 @@ async function deleteRecord(table, data) {
        conditions[key] = value;
      }
    });
+   const conditionsStr = JSON.stringify(conditions);
+   alert(conditionsStr);
  
    if (Object.keys(conditions).length === 0) {
-     alert('請提供至少一個刪除條件！');
+     alert('請提供至少一個刪除條件aaa！' + data);
      return;
    }
 
@@ -913,8 +929,8 @@ async function deleteRecord(table, data) {
   }
  
    try {
-     const response = await fetch(`${API_BASE_URL}/${table}`, {
-       method: 'DELETE',
+     const response = await fetch(`${API_BASE_URL}/${table}/delete`, {
+       method: 'PUT',
        headers: {
          'Content-Type': 'application/json',
        },
@@ -923,7 +939,7 @@ async function deleteRecord(table, data) {
  
      if (response.ok) {
        alert('刪除成功！');
-       fetchData(table);
+      //  fetchData(table);
      } else {
        const errorData = await response.json();
        alert(`刪除失敗：${errorData.message}`);
@@ -943,7 +959,7 @@ async function transferRecord(table, data) {
     return;
   }
   try {
-    const response = await fetch(`${API_BASE_URL}/transfer`, {
+    const response = await fetch(`${API_BASE_URL}/${table}/transfer`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -952,8 +968,8 @@ async function transferRecord(table, data) {
     });
     if (response.ok) {
       alert('移轉成功！');
-      fetchData(table);
-      fetchData('members');
+      // fetchData(table);
+      // fetchData('members');
     } else {
       const errorData = await response.json();
       alert(`移轉失敗：${errorData.message}`);
@@ -966,58 +982,285 @@ async function transferRecord(table, data) {
 
 // 查詢資料
 async function selectRecord(table, data) {
-  // 根據表格類型和查詢條件發送 GET 請求
-  let query = '';
-  Object.entries(data).forEach(([key, value]) => {
-    if (value) { // 只有在有值的情況下才添加到查詢
-      query += `${encodeURIComponent(key)}=${encodeURIComponent(value)}&`;
-    }
-  });
-
-  // 如果沒有條件，阻止查詢
-  if (query === '') {
-    alert('請提供至少一個查詢條件！');
-    return [];
-  }
-  
-  // 去掉最後的 &
-  query = query.slice(0, -1);
-  
   try {
-    const response = await fetch(`${API_BASE_URL}/${table}?${query}`);
+    const response = await fetch(`${API_BASE_URL}/${table}/select`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+    const response_data = await response.json();
+    // alert(1);
+    // alert(Data.messages);
+    // alert(JSON.stringify(response));
     if (response.ok) {
-      const data = await response.json();
-      renderTable(table, data);
       alert('查詢成功！');
-      return data; // 返回查詢結果
-    } else {
-      const errorData = await response.json();
-      alert(`查詢失敗：${errorData.message}`);
-      return [];
+      // 操作成功
+      console.log('Success:', response_data.status);
+      console.log('Messages:', response_data.messages);
+      // 處理多個訊息
+      // if (Data.messages && Array.isArray(Data.messages)) {
+      //   Data.messages.forEach(message => {
+      //       for (const [key, value] of Object.entries(message)) {
+      //           console.log(`${key}: ${value}`);
+      //       }
+      //   });
+      // }
+      // alert('Success: ' + Data.messages.map(msg => JSON.stringify(msg)).join(', '));
+
+      const messagesMapArray = [];
+      let total_value = 0.0, shipped = 0.0, unshipped = 0.0;  
+      if (response_data.messages && Array.isArray(response_data.messages)) {
+        // response_data.messages.forEach(message => {
+        //   const map = new Map(Object.entries(message));
+        //   messagesMapArray.push(map);
+              //   map.forEach((value, key) => {
+              //     console.log(`${key}:`, value);
+              // });
+          if (response_data.messages && Array.isArray(response_data.messages)) {
+            response_data.messages.forEach(message => {
+              const map = new Map(Object.entries(message));
+              messagesMapArray.push(map);
+                  //   map.forEach((value, key) => {
+                  //     console.log(`${key}:`, value);
+                  // });
+              if (table === 'transactions') {
+                if (map.get('price_after_discount') != null) {
+                  let price = parseFloat(map.get('price_after_discount'));
+                  total_value += price;
+                  if (map.get('actual_shipping_date') != null)
+                    shipped += price;
+                  else
+                    unshipped += price;
+                }
+                else {
+                  let price = parseFloat(map.get('total_price'));
+                  total_value += price;
+                  if (map.get('actual_shipping_date') != null)
+                    shipped += price;
+                  else
+                    unshipped += price;
+                }
+              }
+            });
+          }
+          
+        if (table === 'transactions') {
+          updateTransactionTotal(total_value, shipped, unshipped);
+        }
+
+        current_tuples = data;
+        renderTable(table, messagesMapArray);
+        // (messagesMapArray);
+      } else {
+        console.error('Error:', response_data.error || response_data.messages);
+        alert(`查詢失敗: ${response_data.error || response_data.messages}`);
+        // alert(`新增失敗：${errorData.message}`);
+      }
     }
   } catch (error) {
     console.error('查詢資料失敗:', error);
-    alert('無法查詢資料，請檢查後端伺服器狀態！');
+    alert('無法查詢資料，請檢查後端伺服器狀態！' + error);
     return [];
   }
 }
 
-// 列印資料（展示表格中的所有內容）
-async function printTable(table) {
+async function shipped_sort() {
+  shipped = []
+  current_tuples.forEach((message) => {
+    if (message.get('actual_shipping_date') != null) {
+      shipped.push(message);
+    }
+  });
+
+  shipped.sort((a, b) => parseFloat(a.get('price_after_discount')) - parseFloat(b.get('price_after_discount')));
+  renderTable('transactions', shipped);
+}
+
+async function unshipped_sort() {
+  unshipped = []
+  current_tuples.forEach((message) => {
+    if (message.get('actual_shipping_date') == null) {
+      unshipped.push(message);
+    }
+  });
+
+  unshipped.sort((a, b) => parseFloat(a.get('price_after_discount')) - parseFloat(b.get('price_after_discount')));
+  renderTable('transactions', unshipped);
+}
+
+async function fetchData(table) {
   try {
-    const response = await fetch(`${API_BASE_URL}/${table}`);
+    const response = await fetch(`${API_BASE_URL}/${table}/all` , {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      // alert(11)
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    else {
+      // alert(22)
+    }
+    const response_data = await response.json();
     if (response.ok) {
-      const data = await response.json();
-      renderTable(table, data);
-      alert('表格已展示所有內容！');
-    } else {
-      const errorData = await response.json();
-      alert(`列印失敗：${errorData.message}`);
+      alert('查詢成功！');
+      // 操作成功
+      console.log('Success:', response_data.status);
+      console.log('Messages:', response_data.messages);
+
+      const messagesMapArray = [];
+      let total_value = 0.0, shipped = 0.0, unshipped = 0.0;
+      if (response_data.messages && Array.isArray(response_data.messages)) {
+        response_data.messages.forEach(message => {
+          const map = new Map(Object.entries(message));
+          messagesMapArray.push(map);
+              //   map.forEach((value, key) => {
+              //     console.log(`${key}:`, value);
+              // });
+          if (table === 'transactions') {
+            if (map.get('price_after_discount') != null) {
+              let price = parseFloat(map.get('price_after_discount'));
+              total_value += price;
+              if (map.get('actual_shipping_date') != null)
+                shipped += price;
+              else
+                unshipped += price;
+            }
+            else {
+              let price = parseFloat(map.get('total_price'));
+              total_value += price;
+              if (map.get('actual_shipping_date') != null)
+                shipped += price;
+              else
+                unshipped += price;
+            }
+          }
+        });
+        // (messagesMapArray);
+      }
+      if (table === 'transactions') {
+        updateTransactionTotal(total_value.toFixed(2), shipped.toFixed(2), unshipped.toFixed(2));
+      }
+
+
+      current_tuples = messagesMapArray;
+      renderTable(table, messagesMapArray);
+
+    }
+    else {
+      console.error('Error:', response_data.error);
+      alert(`查詢失敗: ${response_data.error }`);
     }
   } catch (error) {
-    console.error('列印資料失敗:', error);
-    alert('無法列印資料，請檢查後端伺服器狀態！');
+    console.error('資料加載失敗:', error);
+    alert('無法加載資料，請檢查後端伺服器狀態！' + error);
   }
+}
+
+function renderTable(table, data) {
+  // const tableBody = document.querySelector(`#${table} tbody`);
+  // tableBody.innerHTML = '';
+  // data.forEach(row => {
+  //   const tr = document.createElement('tr');
+  //   Object.entries(row).forEach(([key, value]) => {
+  //     const td = document.createElement('td');
+  //     if (key.toLowerCase() === 'photo') { // 處理圖片欄位
+  //       const img = document.createElement('img');
+  //       img.src = value;
+  //       td.appendChild(img);
+  //     } else {
+  //       td.textContent = value;
+  //       // 為住址欄位添加工具提示
+  //       if ((table === 'members' || table === 'inactive') && key.toLowerCase() === 'address') {
+  //         td.setAttribute('title', value);
+  //       }
+  //     }
+  //     tr.appendChild(td);
+  //   });
+  //   tableBody.appendChild(tr);
+  // });
+
+  // // 添加行點擊事件以選擇記錄
+  // tableBody.querySelectorAll('tr').forEach(tr => {
+  //   tr.addEventListener('click', () => {
+  //     if (selectedRow) {
+  //       selectedRow.classList.remove('selected');
+  //     }
+  //     selectedRow = tr;
+  //     selectedRow.classList.add('selected');
+  //   });
+  // });
+  const tableBody = document.querySelector(`#${table} tbody`);
+  tableBody.innerHTML = '';
+  attrs = TABLE_ATTRIBUTE.get(table)
+  data.forEach(row => {
+    const tr = document.createElement('tr');
+    
+    // 使用 Map 的 forEach 方法來迭代每個鍵值對
+    // row.forEach((value, key) => {
+    //   const td = document.createElement('td');
+      
+    //   if (key.toLowerCase() === 'photo') { // 處理圖片欄位
+    //     const img = document.createElement('img');
+    //     img.src = value;
+    //     img.alt = 'Photo';
+    //     img.style.width = '50px'; // 根據需求調整圖片大小
+    //     img.style.height = '50px'; // 根據需求調整圖片大小
+    //     td.appendChild(img);
+    //   } else {
+    //     td.textContent = value;
+        
+    //     // 為住址欄位添加工具提示
+    //     if ((table === 'members' || table === 'inactive') && key.toLowerCase() === 'address') {
+    //       td.setAttribute('title', value);
+    //     }
+    //   }
+      
+    //   tr.appendChild(td);
+    // });
+    attrs.forEach(attr => {
+      const td = document.createElement('td');
+      
+      if (attr.toLowerCase() === 'photo') { // 處理圖片欄位
+        const img = document.createElement('img');
+        img.src = row.get(attr);
+        img.alt = 'Photo';
+        img.style.width = '50px'; // 根據需求調整圖片大小
+        img.style.height = '50px'; // 根據需求調整圖片大小
+        td.appendChild(img);
+      } else {
+        td.textContent = row.get(attr);
+        
+        // 為住址欄位添加工具提示
+        if ((table === 'members' || table === 'inactive') && attr.toLowerCase() === 'address') {
+          td.setAttribute('title', row.get(attr));
+        }
+      }
+      
+      tr.appendChild(td);
+    });
+    tableBody.appendChild(tr);
+  });
+
+  // 添加行點擊事件以選擇記錄
+  tableBody.querySelectorAll('tr').forEach(tr => {
+    tr.addEventListener('click', () => {
+      if (selectedRow) {
+        selectedRow.classList.remove('selected');
+      }
+      selectedRow = tr;
+      selectedRow.classList.add('selected');
+    });
+  });
+}
+
+// 列印資料（展示表格中的所有內容）
+async function printTable(table) {
+  fetchData(table);
 }
 
 // 打開修改或刪除的表單
@@ -1051,4 +1294,23 @@ function getKeyAttribute(table) {
     default:
       return '';
   }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var username = prompt("請輸入帳號");
+  var password = prompt("請輸入密碼");
+  
+  if (username !== '015' || password !== '015') {
+    alert("帳號或密碼錯誤");
+    // 若要結束程式可直接重整或導向其他頁面
+    window.location.reload();
+  }
+  // 若正確則不做任何事，維持原本頁面顯示。
+});
+
+// 新增一個方法用來更新總金額顯示
+function updateTransactionTotal(value, shipped, unshipped) {
+  document.getElementById('transaction-total').textContent = value;
+  document.getElementById('transaction-shipped').textContent = shipped;
+  document.getElementById('transaction-unshipped').textContent = unshipped;
 }
