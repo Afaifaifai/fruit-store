@@ -313,7 +313,7 @@ async function purchaseFruit() {
     }
 
     if (input_price < sale_price) {
-        alert(`購買價格必須高於標準售價 $${salePrice.toFixed(2)}`);
+        alert(`購買價格必須高於標準售價 $${sale_price.toFixed(2)}`);
         return;
     }
 
