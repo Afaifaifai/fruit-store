@@ -10,11 +10,11 @@ function updateFruitSelect() {
     update_fruit_date();
     const select = document.getElementById('fruit-select');
     select.innerHTML = '<option value="">選擇水果</option>';
-    fruitDatabase.forEach(fruit_tuple => {
-        const salePrice = (parseFloat(fruit_tuple.get('purchase_price')) * 1.5).toFixed(2);
-        select.innerHTML += `<option value="編號: ${fruit_tuple.get('fruit_id')} - 名稱: ${fruit_tuple.get('fruit_name')}> - 標準售價: $${salePrice} (庫存: ${fruit_tuple.get('quantity')})</option>`;
-    }); 
-    console.log(select.innerHTML);
+    Object.keys(fruitDatabase).forEach(fruitId => {
+        const fruit = fruitDatabase[fruitId];
+        const salePrice = fruit.price.toFixed(2);
+        select.innerHTML += `<option value="${fruitId}">${fruit.name} - 標準售價: $${salePrice} (庫存: ${fruit.stock})</option>`;
+    });
 }
 
 async function update_fruit_date() {
