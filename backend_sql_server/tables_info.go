@@ -11,18 +11,22 @@ var fruits Table = Table{
 	name: "fruits",
 	create: `
 	CREATE TABLE fruits (
-		fruit_id VARCHAR(13) PRIMARY KEY CHECK (fruit_id REGEXP '^[0-9]{2}-[0-9]{3}-[0-9]{3}-[0-9]{2}$'),   -- 水果編號 (格式: YY-YYY-YYY-YY)
-		fruit_name VARCHAR(12) NOT NULL,          															-- 水果名稱 (最多 12 個字元)
-		supplier_name VARCHAR(12) NOT NULL,       															-- 水果供應商名稱 (最多 12 個字元)  --> foreign key to supplier
-		quantity INT CHECK (quantity >= 0 AND quantity <= 999999), 											-- 公司內現有數量 (最多 6 位整數，且不可為負數)
-		unit VARCHAR(4) NOT NULL,                 															-- 單位 (最多 4 個字元)
-		purchase_price DECIMAL(8, 2) CHECK (purchase_price >= 0), 											-- 進貨單價 (6 位整數 + 2 位小數)
-		total_value DECIMAL(8, 2) GENERATED ALWAYS AS (quantity * purchase_price), 							-- 現有價值小計
-		storage_location VARCHAR(12) NOT NULL,    															-- 公司內存放位置 (最多 12 個字元)
+		fruit_id VARCHAR(13) PRIMARY KEY 
+			CHECK (fruit_id LIKE '[0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9]'),   -- 水果編號 (格式: YY-YYY-YYY-YY)
+		
+		fruit_name NVARCHAR(12) NOT NULL,          															-- 水果名稱 (最多 12 個字元)
+		supplier_name NVARCHAR(12) NOT NULL,       															-- 水果供應商名稱 (最多 12 個字元)
+		quantity INT 
+			CHECK (quantity >= 0 AND quantity <= 999999), 											-- 公司內現有數量 (最多 6 位整數，且不可為負數)
+		unit NVARCHAR(4) NOT NULL,                 															-- 單位 (最多 4 個字元)
+		purchase_price DECIMAL(8, 2) 
+			CHECK (purchase_price >= 0), 															-- 進貨單價 (6 位整數 + 2 位小數)
+		total_value AS (quantity * purchase_price) PERSISTED, 										-- 現有價值小計
+		storage_location NVARCHAR(12) NOT NULL,    															-- 公司內存放位置 (最多 12 個字元)
 		purchase_date DATE NOT NULL,              															-- 進貨日期
 		promotion_start_date DATE,                															-- 開始促銷日期
 		discard_date DATE,                         															-- 該丟棄之日期
-		display TINYINT(1) NOT NULL DEFAULT 1
+		display BIT NOT NULL DEFAULT 1	
 	)`,
 	insert: []string{
 		`INSERT INTO fruits (fruit_id, fruit_name, supplier_name, quantity, unit, purchase_price, storage_location, purchase_date, promotion_start_date, discard_date) 
@@ -65,18 +69,35 @@ var members Table = Table{
 	name: "members",
 	create: `
 	CREATE TABLE members (
-		member_id VARCHAR(10) PRIMARY KEY CHECK (member_id REGEXP '^[A-Z]{1}[0-9]{9}$'), -- 格式: 1 英文字母 + 9 數字
-		member_name VARCHAR(12) NOT NULL,
-		phone_number VARCHAR(16) CHECK (phone_number REGEXP '^[0-9]{1,16}$'),
-		mobile_number VARCHAR(16) CHECK (mobile_number REGEXP '^[0-9]{1,16}$'),
+		member_id VARCHAR(10) PRIMARY KEY 
+			CHECK (member_id LIKE '[A-Z][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'), -- 格式: 1 英文字母 + 9 數字
+
+		member_name NVARCHAR(12) NOT NULL,
+		
+		phone_number VARCHAR(16) 
+			CHECK (phone_number NOT LIKE '%[^0-9]%'), -- 1-16 位數字
+		
+		mobile_number VARCHAR(16) 
+			CHECK (mobile_number NOT LIKE '%[^0-9]%'), -- 1-16 位數字
+		
 		email VARCHAR(36) NOT NULL,
-		joined_line VARCHAR(8) DEFAULT '不是',
-		address VARCHAR(60),
-		age INT CHECK (age >= 0),
-		photo LONGTEXT, -- Base64
-		discount DECIMAL(3, 2) DEFAULT 1.00 CHECK (discount >= 0 AND discount <= 1) DEFAULT 0.88,
-		display TINYINT(1) NOT NULL DEFAULT 1,
+		
+		joined_line NVARCHAR(8) DEFAULT '不是',
+		
+		address NVARCHAR(60),
+		
+		age INT 
+			CHECK (age >= 0),
+		
+		photo NVARCHAR(MAX), -- Base64
+		
+		discount DECIMAL(3, 2) DEFAULT 0.88 
+			CHECK (discount >= 0 AND discount <= 1),
+		
+		display BIT NOT NULL DEFAULT 1, -- 1 表示顯示，0 表示隱藏
+		
 		username VARCHAR(20) NOT NULL,
+		
 		password VARCHAR(20) NOT NULL
 	)`,
 	insert: []string{
@@ -107,18 +128,35 @@ var inactive Table = Table{
 	name: "inactive",
 	create: `
 	CREATE TABLE inactive (
-		member_id VARCHAR(10) PRIMARY KEY CHECK (member_id REGEXP '^[A-Z]{1}[0-9]{9}$'), -- 格式: 1 英文字母 + 9 數字
-		member_name VARCHAR(12) NOT NULL,
-		phone_number VARCHAR(16) CHECK (phone_number REGEXP '^[0-9]{1,16}$'),
-		mobile_number VARCHAR(16) CHECK (mobile_number REGEXP '^[0-9]{1,16}$'),
+		member_id VARCHAR(10) PRIMARY KEY 
+			CHECK (member_id LIKE '[A-Z][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'), -- 格式: 1 英文字母 + 9 數字
+
+		member_name NVARCHAR(12) NOT NULL,
+		
+		phone_number VARCHAR(16) 
+			CHECK (phone_number NOT LIKE '%[^0-9]%'), -- 1-16 位數字
+		
+		mobile_number VARCHAR(16) 
+			CHECK (mobile_number NOT LIKE '%[^0-9]%'), -- 1-16 位數字
+		
 		email VARCHAR(36) NOT NULL,
-		joined_line VARCHAR(8) DEFAULT '不是',
-		address VARCHAR(60),
-		age INT CHECK (age >= 0),
-		photo LONGTEXT, -- Base64
-		discount DECIMAL(3, 2) DEFAULT 1.00 CHECK (discount >= 0 AND discount <= 1) DEFAULT 0.88,
-		display TINYINT(1) NOT NULL DEFAULT 1,
+		
+		joined_line NVARCHAR(8) DEFAULT '不是',
+		
+		address NVARCHAR(60),
+		
+		age INT 
+			CHECK (age >= 0),
+		
+		photo NVARCHAR(MAX), -- Base64
+		
+		discount DECIMAL(3, 2) DEFAULT 0.88 
+			CHECK (discount >= 0 AND discount <= 1),
+		
+		display BIT NOT NULL DEFAULT 1, -- 1 表示顯示，0 表示隱藏
+		
 		username VARCHAR(20) NOT NULL,
+		
 		password VARCHAR(20) NOT NULL
 	)`,
 	insert: []string{
@@ -149,13 +187,21 @@ var suppliers Table = Table{
 	name: "suppliers",
 	create: `
 	CREATE TABLE suppliers (
-		supplier_id VARCHAR(8) PRIMARY KEY CHECK (supplier_id REGEXP '^[0-9]{8}'),	-- 供應商統一編號 (8 位數字)
-		supplier_name VARCHAR(12) NOT NULL,       									-- 供應商名稱 (最多 12 個字元)
-		phone_number VARCHAR(16) CHECK (phone_number REGEXP '^[0-9]{1,16}$'),
-		email VARCHAR(36) NOT NULL,               									-- Email
-		address VARCHAR(60),                      									-- 住址
-		contact_name VARCHAR(12) NOT NULL,         									-- 負責人姓名
-		display TINYINT(1) NOT NULL DEFAULT 1
+		supplier_id VARCHAR(8) PRIMARY KEY 
+			CHECK (supplier_id LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'), -- 供應商統一編號 (8 位數字)
+
+		supplier_name NVARCHAR(12) NOT NULL,                                        -- 供應商名稱 (最多 12 個字元)
+
+		phone_number VARCHAR(16) 
+			CHECK (phone_number NOT LIKE '%[^0-9]%'),                             -- 1-16 位數字
+
+		email VARCHAR(36) NOT NULL,                                                -- Email
+
+		address NVARCHAR(60),                                                       -- 住址
+
+		contact_name NVARCHAR(12) NOT NULL,                                        -- 負責人姓名
+
+		display BIT NOT NULL DEFAULT 1  
 	)`,
 	insert: []string{
 		`INSERT INTO suppliers (supplier_id, supplier_name, phone_number, email, address, contact_name) 
@@ -192,29 +238,29 @@ var suppliers Table = Table{
 var transactions Table = Table{
 	name: "transactions",
 	create: `
-	CREATE TABLE transactions (
-		transaction_id INT UNIQUE AUTO_INCREMENT, 										-- 交易編號	
-		fruit_id VARCHAR(13),    														-- 水果編號 (格式: YY-YYY-YYY-YY)  --> foreign key to fruits
-		member_id VARCHAR(10) , 														-- 會員身份證字號  格式: 1 英文字母 + 9 數字 --> foreign key to members
-		fruit_name VARCHAR(12) NOT NULL,          										-- 水果名稱 (最多 12 個字元)	
-		supplier_name VARCHAR(12) NOT NULL,       										-- 水果供應商名稱 (最多 12 個字元)  --> foreign key to supplier
-		purchase_quantity INT  NOT NULL,												-- 購買數量 (最多 6 位整數，且不可為負數)
+		CREATE TABLE transactions (
+		transaction_id INT UNIQUE IDENTITY(1,1), 											-- 交易編號，自動遞增
+		fruit_id VARCHAR(13) NOT NULL,    													-- 水果編號 (格式: YY-YYY-YYY-YY)  --> foreign key to fruits
+		member_id VARCHAR(10) NOT NULL, 													-- 會員身份證字號  格式: 1 英文字母 + 9 數字 --> foreign key to members
+		fruit_name NVARCHAR(12) NOT NULL,          										-- 水果名稱 (最多 12 個字元)	
+		supplier_name NVARCHAR(12) NOT NULL,       										-- 水果供應商名稱 (最多 12 個字元)  --> foreign key to supplier
+		purchase_quantity INT NOT NULL CHECK (purchase_quantity >= 0 AND purchase_quantity <= 999999),	-- 購買數量 (最多 6 位整數，且不可為負數)
 		sale_price DECIMAL(8, 2) NOT NULL,                								-- 出售單價
-		total_price DECIMAL(8, 2) GENERATED ALWAYS AS (purchase_quantity * sale_price), -- 總金額
-		price_after_discount DECIMAL(8, 2), 											-- 折扣後金額
-		transaction_date DATE NOT NULL,              									-- 交易日期
-		expected_shipping_date DATE NOT NULL,                							-- 預計交運日期
+		total_price AS (purchase_quantity * sale_price) PERSISTED, 						-- 總金額，計算欄位
+		price_after_discount DECIMAL(8, 2), 												-- 折扣後金額
+		transaction_date DATE NOT NULL,              										-- 交易日期
+		expected_shipping_date DATE NOT NULL,                								-- 預計交運日期
 		actual_shipping_date DATE,                         								-- 實際交運日期日期
-		display TINYINT(1) NOT NULL DEFAULT 1,
-		shipped TINYINT(1) AS (
+		display BIT NOT NULL DEFAULT 1,														-- 顯示狀態 (1 表示顯示，0 表示隱藏)
+		shipped AS (
 			CASE
 				WHEN actual_shipping_date IS NULL THEN 0
 				ELSE 1
 			END
-		) VIRTUAL,
+		) PERSISTED,																		-- 計算欄位，標示是否已發貨
 		
 		CHECK (purchase_quantity >= 0 AND purchase_quantity <= 999999),
-
+		
 		PRIMARY KEY (transaction_id, fruit_id, member_id),
 		
 		FOREIGN KEY (fruit_id) REFERENCES fruits(fruit_id)

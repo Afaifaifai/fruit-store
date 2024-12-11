@@ -19,7 +19,7 @@ func Init() {
 	// defer db_server.Close()
 	if err := db_server.Ping(); err != nil {
 		// return nil, err
-		log.Println("Failed to ping the SQL Server: %v", err)
+		log.Printf("Failed to ping the SQL Server: %v\n", err)
 	}
 	log.Println("Database initialization begin.")
 	err = ensure_database_exists(db_server, DATABASE_NAME, RESET_DATABASE)
@@ -64,7 +64,8 @@ func ensure_database_exists(db *sql.DB, database_name string, reset_db bool) err
 	}
 
 	// Check if the database exists
-	query := fmt.Sprintf("SHOW DATABASES LIKE '%s'", database_name)
+	query := "SELECT name FROM sys.databases WHERE name LIKE '%" + database_name + "%'"
+
 	fmt.Println(query)
 	var result string
 	err := db.QueryRow(query).Scan(&result)
@@ -90,7 +91,9 @@ func ensure_database_exists(db *sql.DB, database_name string, reset_db bool) err
 // Ensure the table exists function
 func ensure_table_exists(db *sql.DB, table_name string, table_content string) error {
 	// Check if the table exists
-	query := fmt.Sprintf("SHOW TABLES LIKE '%s'", table_name)
+	query := fmt.Sprintf("SELECT name FROM sys.tables WHERE name LIKE '%s'", table_name)
+	fmt.Println(query)
+
 	var result string
 	err := db.QueryRow(query).Scan(&result)
 	if err != nil && err != sql.ErrNoRows {
